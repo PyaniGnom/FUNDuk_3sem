@@ -18,9 +18,14 @@ public:
     bool isExist();
     ///\n Удаление всех вхождений заданного элемента
     void DeleteAllEntry(int value);
+    ///\n Удаление элементов перед каждым вхождением заданного
     void DeleteAllEntryPrev(int value);
+    ///\n Поиск индекса элемента по значению
     int Find(int value);
+    ///\n Математическое объединение списков
     List* Union(List& secondList);
+    ///\n Получение списка элементов с 4 и более делителями
+    List* GetDivisorsList();
 
 private:
     struct Node {

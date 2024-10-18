@@ -139,3 +139,26 @@ List* List::Union(List& secondList) {
 
     return newList;
 }
+
+List *List::GetDivisorsList() {
+    List* divList = new List();
+    Node* current = head;
+    int counter = 2;
+
+    while (current != nullptr) {
+        for (int i = 2; i <= current->data / 2; ++i) {
+            if (current->data % i == 0) {
+                ++counter;
+            }
+            if (counter >= 4) {
+                divList->PushFront(current->data);
+                break;
+            }
+        }
+
+        current = current->pNext;
+        counter = 2;
+    }
+
+    return divList;
+}
