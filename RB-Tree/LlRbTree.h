@@ -1,14 +1,15 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
 #ifndef RB_TREE_LLRBTREE_H
 #define RB_TREE_LLRBTREE_H
 
 
 #include <fmt/color.h>
 
-template <typename Key, typename Value>
 class LlRbTree {
 public:
     LlRbTree() {
-        _nil = new Node(Key(), Value());
+        _nil = new Node();
         _nil->color = BLACK;
         _root = _nil;
     }
@@ -18,26 +19,31 @@ public:
         delete _nil;
     }
 
-    void Insert(Key key, Value value) {
-        Node* newNode = new Node(key, value);
+    void Insert(int key, std::string value) {
+        Node* newNode = new Node(key, std::move(value));
         newNode->left = _nil;
         newNode->right = _nil;
         _root = insertNode(_root, newNode);
         _root->color = BLACK;
     }
 
-    void Erase(Key key) {
+    void Erase(const int& key) {
         _root = eraseNode(_root, key);
         _root->color = BLACK;
     }
 
-    void Print() {
-        fmt::print("\n");
-        print(_root);
+    std::string Find(const int& key) {
+        Node* node = searchNode(_root, key);
+        if (node == _nil) return {};
+        return node->value;
     }
 
     void Clear() {
         _root = clear(_root);
+    }
+
+    void Print() {
+        print(_root);
     }
 
     /// Прямой обход дерева
@@ -62,36 +68,36 @@ public:
     }
 
 private:
-    const std::string CH_UP_HOR = "\u2514\u2500";       // "└─"
-    const std::string CH_DOWN_HOR = "\u250C\u2500";     // "┌─"
-    const std::string CH_VER = "\u2502 ";               // "│ "
-    const fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
-    const fmt::text_style CONSOLE_BLACK_COLOR = fmt::fg(fmt::color::dark_gray);
+    constexpr static std::string CH_UP_HOR = "\u2514\u2500";       // "└─"
+    constexpr static std::string CH_DOWN_HOR = "\u250C\u2500";     // "┌─"
+    constexpr static std::string CH_VER = "\u2502 ";               // "│ "
+    constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
+    constexpr static fmt::text_style CONSOLE_BLACK_COLOR = fmt::fg(fmt::color::dark_gray);
 
-    const static bool RED = false;
-    const static bool BLACK = true;
+    constexpr static bool RED = false;
+    constexpr static bool BLACK = true;
 
     struct Node {
-        Key key;        // ключ узла
-        Value value;    // значения узла
-        bool color;     // цвет узла
-        Node* left;     // указатель на левого потомка
-        Node* right;    // указатель на правого потомка
+        int key;                // ключ узла
+        std::string value;      // значения узла
+        bool color;             // цвет узла
+        Node* left;             // указатель на левого потомка
+        Node* right;            // указатель на правого потомка
 
         // конструктор узла
-        Node(Key k, Value val) {
-            key = k;
-            value = val;
-            color = RED;
-            left = nullptr;
-            right = nullptr;
+        explicit Node(int key = {}, std::string value = {}) {
+            this->key = key;
+            this->value = std::move(value);
+            this->color = RED;
+            this->left = nullptr;
+            this->right = nullptr;
         };
     };
 
     Node* _root;
     Node* _nil;
 
-    Node* rotateRight(Node* node) {
+    static Node* rotateRight(Node* node) {
         Node* leftNode = node->left;
 
         node->left = leftNode->right;
@@ -103,7 +109,7 @@ private:
         return leftNode;
     }
 
-    Node* rotateLeft(Node* node) {
+    static Node* rotateLeft(Node* node) {
         Node* rightNode = node->right;
 
         node->right = rightNode->left;
@@ -115,7 +121,7 @@ private:
         return rightNode;
     }
 
-    bool isRed(Node* node) {
+    static bool isRed(Node* node) {
         return node->color == RED;
     }
 
@@ -177,18 +183,18 @@ private:
         return node->left != _nil ? findMin(node->left) : node;
     }
 
-    Node* eraseMin(Node* node) {
+    Node* removeMin(Node* node) {
         if (node->left == _nil) return _nil;
 
         if (!isRed(node->left) && !isRed(node->left->left)) {
             node = moveRedLeft(node);
         }
-        node->left = eraseMin(node->left);
+        node->left = removeMin(node->left);
 
         return fixUp(node);
     }
 
-    Node* eraseNode(Node* node, Key key) {
+    Node* eraseNode(Node* node, const int& key) {
         if (node == _nil) return _nil;
 
         if (key < node->key) {
@@ -210,7 +216,7 @@ private:
             }
             if (key == node->key) {
                 Node* min = findMin(node->right);
-                min->right = eraseMin(node->right);
+                min->right = removeMin(node->right);
                 min->left = node->left;
                 min->color = node->color;
 
@@ -224,6 +230,17 @@ private:
         }
 
         return fixUp(node);
+    }
+
+    Node* searchNode(Node* node, const int& key) {
+        if (node == _nil || node->key == key) return node;
+
+        if (key < node->key) {
+            return searchNode(node->left, key);
+        }
+        else {
+            return searchNode(node->right, key);
+        }
     }
 
     Node* clear(Node* node) {
@@ -286,3 +303,4 @@ private:
 
 
 #endif //RB_TREE_LLRBTREE_H
+#pragma clang diagnostic pop
