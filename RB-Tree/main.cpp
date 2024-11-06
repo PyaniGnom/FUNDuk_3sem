@@ -1,8 +1,37 @@
 #include <fmt/color.h>
 #include "LlRbTree.h"
+#include "RbTree.h"
 
 int main() {
-    LlRbTree llRbTree;
+    RbTree rbTree;
+
+    rbTree.Insert(10, "AGF");
+    rbTree.Insert(18, "JGHA");
+    rbTree.Insert(7, "URY");
+    rbTree.Insert(15, "OIG");
+    rbTree.Insert(16, "ZLJD");
+    rbTree.Insert(30, "YTERQ");
+    rbTree.Insert(25, "PYKG");
+    rbTree.Insert(40, "JGHHW");
+    rbTree.Insert(60, "GPOR");
+
+    /*for (int i = 1; i <= 20; ++i) {
+        rbTree.Insert(i * i, std::string(1, static_cast<char>(65 + i)) +
+                                           std::string(1, static_cast<char>(75 + i)));
+    }*/
+
+    rbTree.Print();
+
+    /*LlRbTree llRbTree;
+
+    for (int i = 1; i <= 20; ++i) {
+        llRbTree.Insert(i * i, std::string(1, static_cast<char>(65 + i)) +
+                                std::string(1, static_cast<char>(75 + i)));
+    }
+    llRbTree.Print();
+
+    llRbTree.Erase(64);
+    llRbTree.Print();
 
     llRbTree.Insert(10, "AGF");
     llRbTree.Insert(18, "JGHA");
@@ -13,6 +42,20 @@ int main() {
     llRbTree.Insert(25, "PYKG");
     llRbTree.Insert(40, "JGHHW");
     llRbTree.Insert(60, "GPOR");
+    llRbTree.Print();
+
+    llRbTree.RemoveMax();
+    llRbTree.Print();
+    llRbTree.RemoveMax();
+    llRbTree.Print();
+    llRbTree.RemoveMax();
+    llRbTree.Print();
+    llRbTree.RemoveMax();
+    llRbTree.Print();
+    llRbTree.RemoveMax();
+    llRbTree.Print();
+
+    llRbTree.Erase(10);
     llRbTree.Print();
 
     std::string preOrder = std::move(llRbTree.GetPreOrderTraversalString());
@@ -39,7 +82,7 @@ int main() {
     llRbTree.Print();
     fmt::print("\n");
     llRbTree2.Print();
-    fmt::print("\n");
+    fmt::print("\n");*/
 
     return 0;
 }

@@ -5,12 +5,13 @@
 
 
 #include <fmt/color.h>
+#include "Node.h"
 
 class LlRbTree {
 public:
     LlRbTree() {
         _nil = new Node();
-        _nil->color = BLACK;
+        _nil->paintBlack();
         _root = _nil;
     }
 
@@ -24,12 +25,12 @@ public:
         newNode->left = _nil;
         newNode->right = _nil;
         _root = insertNode(_root, newNode);
-        _root->color = BLACK;
+        _root->paintBlack();
     }
 
     void Erase(const int& key) {
         _root = eraseNode(_root, key);
-        _root->color = BLACK;
+        _root->paintBlack();
     }
 
     std::string Find(const int& key) {
@@ -43,6 +44,7 @@ public:
     }
 
     void Print() {
+        fmt::print("\n");
         print(_root);
     }
 
@@ -74,29 +76,10 @@ private:
     constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
     constexpr static fmt::text_style CONSOLE_BLACK_COLOR = fmt::fg(fmt::color::dark_gray);
 
-    constexpr static bool RED = false;
-    constexpr static bool BLACK = true;
-
-    struct Node {
-        int key;                // ключ узла
-        std::string value;      // значения узла
-        bool color;             // цвет узла
-        Node* left;             // указатель на левого потомка
-        Node* right;            // указатель на правого потомка
-
-        // конструктор узла
-        explicit Node(int key = {}, std::string value = {}) {
-            this->key = key;
-            this->value = std::move(value);
-            this->color = RED;
-            this->left = nullptr;
-            this->right = nullptr;
-        };
-    };
-
     Node* _root;
     Node* _nil;
 
+    // правый поворот вокруг некоторого узла
     static Node* rotateRight(Node* node) {
         Node* leftNode = node->left;
 
@@ -104,11 +87,12 @@ private:
         leftNode->right = node;
 
         leftNode->color = node->color;
-        node->color = RED;
+        node->paintRed();
 
         return leftNode;
     }
 
+    // левый поворот вокруг некоторого узла
     static Node* rotateLeft(Node* node) {
         Node* rightNode = node->right;
 
@@ -116,34 +100,33 @@ private:
         rightNode->left = node;
 
         rightNode->color = node->color;
-        node->color = RED;
+        node->paintRed();
 
         return rightNode;
     }
 
-    static bool isRed(Node* node) {
-        return node->color == RED;
-    }
-
+    // реверс цветов некоторого узла и его потомков
     void flipColors(Node* node) {
         node->color = !node->color;
         if (node->left != _nil) node->left->color = !node->left->color;
         if (node->right != _nil) node->right->color = !node->right->color;
     }
 
+    // фикс дерева с корнем node
     Node* fixUp(Node* node) {
-        if (isRed(node->right) && !isRed(node->left)) {
+        if (node->right->isRed() && !node->left->isRed()) {
             node = rotateLeft(node);
         }
-        if (isRed(node->left) && isRed(node->left->left)) {
+        if (node->left->isRed() && node->left->left->isRed()) {
             node = rotateRight(node);
         }
-        if (isRed(node->left) && isRed(node->right)) {
+        if (node->left->isRed() && node->right->isRed()) {
             flipColors(node);
         }
         return node;
     }
 
+    // вставка нового узла newNode в дерево с корнем node
     Node* insertNode(Node* node, Node* newNode) {
         if (node == _nil) return newNode;
 
@@ -162,7 +145,7 @@ private:
 
     Node* moveRedLeft(Node* node) {
         flipColors(node);
-        if (isRed(node->right->left)) {
+        if (node->right->left->isRed()) {
             node->right = rotateRight(node->right);
             node = rotateLeft(node);
             flipColors(node);
@@ -172,7 +155,7 @@ private:
 
     Node* moveRedRight(Node* node) {
         flipColors(node);
-        if (isRed(node->left->left)) {
+        if (node->left->left->isRed()) {
             node = rotateRight(node);
             flipColors(node);
         }
@@ -186,7 +169,7 @@ private:
     Node* removeMin(Node* node) {
         if (node->left == _nil) return _nil;
 
-        if (!isRed(node->left) && !isRed(node->left->left)) {
+        if (!node->left->isRed() && !node->left->left->isRed()) {
             node = moveRedLeft(node);
         }
         node->left = removeMin(node->left);
@@ -198,20 +181,20 @@ private:
         if (node == _nil) return _nil;
 
         if (key < node->key) {
-            if (node->left != _nil && !isRed(node->left) && !isRed(node->left->left)) {
+            if (node->left != _nil && !node->left->isRed() && !node->left->left->isRed()) {
                 node = moveRedLeft(node);
             }
             node->left = eraseNode(node->left, key);
         }
         else {
-            if (isRed(node->left)) {
+            if (node->left->isRed()) {
                 node = rotateRight(node);
             }
             if (key == node->key && node->right == _nil) {
                 delete node;
                 return _nil;
             }
-            if (node->right != _nil && !isRed(node->right) && !isRed(node->right->left)) {
+            if (node->right != _nil && !node->right->isRed() && !node->right->left->isRed()) {
                 node = moveRedRight(node);
             }
             if (key == node->key) {
@@ -264,11 +247,11 @@ private:
         }
 
         fmt::print(fmt::fg(fmt::color::aquamarine), "{}", cpref);
-        if (node->color == BLACK) {
-            fmt::print(CONSOLE_BLACK_COLOR, "B:{}\n", node->key);
+        if (node->isRed()) {
+            fmt::print(CONSOLE_RED_COLOR, "R:{}\n", node->key);
         }
         else {
-            fmt::print(CONSOLE_RED_COLOR, "R:{}\n", node->key);
+            fmt::print(CONSOLE_BLACK_COLOR, "B:{}\n", node->key);
         }
 
         if (node->left != _nil) {

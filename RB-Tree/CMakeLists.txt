@@ -7,6 +7,7 @@ find_package(fmt REQUIRED)
 
 add_executable(RB_Tree main.cpp
         LlRbTree.h
-        LlRbTreeModernized.h
+        RbTree.h
+        Node.h
 )
 target_link_libraries(RB_Tree fmt::fmt)
