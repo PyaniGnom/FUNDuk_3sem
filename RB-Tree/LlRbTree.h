@@ -11,7 +11,7 @@ class LlRbTree {
 public:
     LlRbTree() {
         _nil = new Node();
-        _nil->paintBlack();
+        _nil->PaintBlack();
         _root = _nil;
     }
 
@@ -25,12 +25,12 @@ public:
         newNode->left = _nil;
         newNode->right = _nil;
         _root = insertNode(_root, newNode);
-        _root->paintBlack();
+        _root->PaintBlack();
     }
 
     void Erase(const int& key) {
         _root = eraseNode(_root, key);
-        _root->paintBlack();
+        _root->PaintBlack();
     }
 
     std::string Find(const int& key) {
@@ -87,7 +87,7 @@ private:
         leftNode->right = node;
 
         leftNode->color = node->color;
-        node->paintRed();
+        node->PaintRed();
 
         return leftNode;
     }
@@ -100,7 +100,7 @@ private:
         rightNode->left = node;
 
         rightNode->color = node->color;
-        node->paintRed();
+        node->PaintRed();
 
         return rightNode;
     }
@@ -114,13 +114,13 @@ private:
 
     // фикс дерева с корнем node
     Node* fixUp(Node* node) {
-        if (node->right->isRed() && !node->left->isRed()) {
+        if (node->right->IsRed() && node->left->IsBlack()) {
             node = rotateLeft(node);
         }
-        if (node->left->isRed() && node->left->left->isRed()) {
+        if (node->left->IsRed() && node->left->left->IsRed()) {
             node = rotateRight(node);
         }
-        if (node->left->isRed() && node->right->isRed()) {
+        if (node->left->IsRed() && node->right->IsRed()) {
             flipColors(node);
         }
         return node;
@@ -145,7 +145,7 @@ private:
 
     Node* moveRedLeft(Node* node) {
         flipColors(node);
-        if (node->right->left->isRed()) {
+        if (node->right->left->IsRed()) {
             node->right = rotateRight(node->right);
             node = rotateLeft(node);
             flipColors(node);
@@ -155,7 +155,7 @@ private:
 
     Node* moveRedRight(Node* node) {
         flipColors(node);
-        if (node->left->left->isRed()) {
+        if (node->left->left->IsRed()) {
             node = rotateRight(node);
             flipColors(node);
         }
@@ -169,7 +169,7 @@ private:
     Node* removeMin(Node* node) {
         if (node->left == _nil) return _nil;
 
-        if (!node->left->isRed() && !node->left->left->isRed()) {
+        if (node->left->IsBlack() && node->left->left->IsBlack()) {
             node = moveRedLeft(node);
         }
         node->left = removeMin(node->left);
@@ -181,20 +181,20 @@ private:
         if (node == _nil) return _nil;
 
         if (key < node->key) {
-            if (node->left != _nil && !node->left->isRed() && !node->left->left->isRed()) {
+            if (node->left != _nil && node->left->IsBlack() && node->left->left->IsBlack()) {
                 node = moveRedLeft(node);
             }
             node->left = eraseNode(node->left, key);
         }
         else {
-            if (node->left->isRed()) {
+            if (node->left->IsRed()) {
                 node = rotateRight(node);
             }
             if (key == node->key && node->right == _nil) {
                 delete node;
                 return _nil;
             }
-            if (node->right != _nil && !node->right->isRed() && !node->right->left->isRed()) {
+            if (node->right != _nil && node->right->IsBlack() && node->right->left->IsBlack()) {
                 node = moveRedRight(node);
             }
             if (key == node->key) {
@@ -247,7 +247,7 @@ private:
         }
 
         fmt::print(fmt::fg(fmt::color::aquamarine), "{}", cpref);
-        if (node->isRed()) {
+        if (node->IsRed()) {
             fmt::print(CONSOLE_RED_COLOR, "R:{}\n", node->key);
         }
         else {

@@ -24,15 +24,19 @@ public:
     };
 
     // проверка является ли некоторый узел красным
-    bool isRed() {
+    bool IsRed() {
         return this->color == RED;
     }
 
-    void paintBlack() {
+    bool IsBlack() {
+        return this->color == BLACK;
+    }
+
+    void PaintBlack() {
         this->color = BLACK;
     }
 
-    void paintRed() {
+    void PaintRed() {
         this->color = RED;
     }
 

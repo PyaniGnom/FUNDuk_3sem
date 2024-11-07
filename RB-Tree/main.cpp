@@ -21,6 +21,10 @@ int main() {
     }*/
 
     rbTree.Print();
+    rbTree.Erase(16);
+    rbTree.Print();
+    rbTree.Erase(15);
+    rbTree.Print();
 
     /*LlRbTree llRbTree;
 
@@ -44,17 +48,6 @@ int main() {
     llRbTree.Insert(60, "GPOR");
     llRbTree.Print();
 
-    llRbTree.RemoveMax();
-    llRbTree.Print();
-    llRbTree.RemoveMax();
-    llRbTree.Print();
-    llRbTree.RemoveMax();
-    llRbTree.Print();
-    llRbTree.RemoveMax();
-    llRbTree.Print();
-    llRbTree.RemoveMax();
-    llRbTree.Print();
-
     llRbTree.Erase(10);
     llRbTree.Print();
 
@@ -66,23 +59,7 @@ int main() {
     fmt::print("{}\n\n", inOrder);
 
     auto find1 = llRbTree.Find(30);
-    auto find2 = llRbTree.Find(80);
-
-
-    LlRbTree llRbTree2;
-
-    for (int i = 1; i <= 10; ++i) {
-        llRbTree2.Insert(i * i, std::string(1, static_cast<char>(65 + i)) +
-                std::string(1, static_cast<char>(75 + i)));
-    }
-
-    llRbTree2.Print();
-    fmt::print("\n");
-    llRbTree.Clear();
-    llRbTree.Print();
-    fmt::print("\n");
-    llRbTree2.Print();
-    fmt::print("\n");*/
+    auto find2 = llRbTree.Find(80);*/
 
     return 0;
 }

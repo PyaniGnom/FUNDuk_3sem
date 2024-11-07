@@ -11,7 +11,7 @@ class RbTree {
 public:
     RbTree() {
         _nil = new Node();
-        _nil->paintBlack();
+        _nil->PaintBlack();
         _root = _nil;
     }
 
@@ -25,6 +25,13 @@ public:
         newNode->left = _nil;
         newNode->right = _nil;
         insertNode(newNode);
+    }
+
+    void Erase(int key) {
+        Node* nodeToDelete = searchHelper(_root, key);
+        if (nodeToDelete->key == key) {
+            eraseNodeWithReplacementPredecessor(nodeToDelete);
+        }
     }
 
     void Clear() {
@@ -70,22 +77,21 @@ private:
     // правый поворот вокруг некоторого узла
     void rotateRight(Node* node) {
         Node* leftNode = node->left;
-        Node* nodeParent = node->parent;
+
+        leftNode->parent = node->parent;
+        if (node->parent == _nil) {
+            _root = leftNode;
+        }
+        else if (node->parent->right == node) {
+            node->parent->right = leftNode;
+        }
+        else {
+            node->parent->left = leftNode;
+        }
 
         node->left = leftNode->right;
         if (leftNode->right != _nil) {
             leftNode->right->parent = node;
-        }
-
-        leftNode->parent = node->parent;
-        if (nodeParent == _nil) {
-            _root = leftNode;
-        }
-        else if (nodeParent->right == node) {
-            nodeParent->right = leftNode;
-        }
-        else {
-            nodeParent->left = leftNode;
         }
 
         leftNode->right = node;
@@ -95,50 +101,49 @@ private:
     // левый поворот вокруг некоторого узла
     void rotateLeft(Node* node) {
         Node* rightNode = node->right;
-        Node* nodeParent = node->parent;
+
+        rightNode->parent = node->parent;
+        if (node->parent == _nil) {
+            _root = rightNode;
+        }
+        else if (node->parent->left == node) {
+            node->parent->left = rightNode;
+        }
+        else {
+            node->parent->right = rightNode;
+        }
 
         node->right = rightNode->left;
         if (rightNode->left != _nil) {
             rightNode->left->parent = node;
         }
 
-        rightNode->parent = node->parent;
-        if (nodeParent == _nil) {
-            _root = rightNode;
-        }
-        else if (nodeParent->left == node) {
-            nodeParent->left = rightNode;
-        }
-        else {
-            nodeParent->right = rightNode;
-        }
-
         rightNode->left = node;
         node->parent = rightNode;
     }
 
-    Node* searchHelper(Node* node, Node* searchedNode) {
-        if (node == _nil || searchedNode->key == node->key) {
+    Node* searchHelper(Node* node, int key) {
+        if (node == _nil || key == node->key) {
             return node;
         }
-        else if (searchedNode->key < node->key) {
+        else if (key < node->key) {
             if (node->left == _nil) {
                 return node;
             }
 
-            return searchHelper(node->left, searchedNode);
+            return searchHelper(node->left, key);
         }
         else {
             if (node->right == _nil) {
                 return node;
             }
 
-            return searchHelper(node->right, searchedNode);
+            return searchHelper(node->right, key);
         }
     }
 
     void insertNode(Node* newNode) {
-        Node* newNodeParent = searchHelper(_root, newNode);
+        Node* newNodeParent = searchHelper(_root, newNode->key);
 
         if (newNode->key == newNodeParent->key) {
             return;
@@ -159,15 +164,14 @@ private:
     }
 
     void rebalanceInsert(Node* node) {
-        while (node != _root && node->parent->isRed()) {
+        while (node->parent->IsRed()) {
             Node* grandpa = node->parent->parent;
             Node* uncle = grandpa->left == node->parent ? grandpa->right : grandpa->left;
 
-            if (uncle->isRed()) {
-                node->parent->paintBlack();
-                uncle->paintBlack();
-                grandpa->paintRed();
-                node = grandpa;
+            if (uncle->IsRed()) {
+                node->parent->PaintBlack();
+                uncle->PaintBlack();
+                grandpa->PaintRed();
             }
             else {
                 if (node->parent == grandpa->left) {
@@ -175,8 +179,8 @@ private:
                         node = node->parent;
                         rotateLeft(node);
                     }
-                    node->parent->paintBlack();
-                    grandpa->paintRed();
+                    node->parent->PaintBlack();
+                    grandpa->PaintRed();
 
                     rotateRight(grandpa);
                 }
@@ -185,13 +189,169 @@ private:
                         node = node->parent;
                         rotateRight(node);
                     }
-                    node->parent->paintBlack();
-                    grandpa->paintRed();
+                    node->parent->PaintBlack();
+                    grandpa->PaintRed();
                     rotateLeft(grandpa);
                 }
             }
+            node = grandpa;
         }
-        _root->paintBlack();
+        _root->PaintBlack();
+    }
+
+    Node* findMin(Node* node) {
+        return node->left != _nil ? findMin(node->left) : node;
+    }
+
+    Node* findMax(Node* node) {
+        return node->right != _nil ? findMax(node->right) : node;
+    }
+
+    void transplant(Node* toNode, Node* fromNode) {
+        if (toNode->parent == _nil)
+            _root = fromNode;
+        else if (toNode == toNode->parent->left)
+            toNode->parent->left = fromNode;
+        else
+            toNode->parent->right = fromNode;
+        fromNode->parent = toNode->parent;
+    }
+
+    void eraseNodeWithReplacementSuccessor(Node* nodeToDelete) {
+        Node* child;
+        bool removedNodeColor = nodeToDelete->color;
+
+        if (nodeToDelete->left == _nil) {
+            child = nodeToDelete->right;
+            transplant(nodeToDelete, nodeToDelete->right);
+        }
+        else if (nodeToDelete->right == _nil) {
+            child = nodeToDelete->left;
+            transplant(nodeToDelete, nodeToDelete->left);
+        }
+        else {
+            Node* minNode = findMin(nodeToDelete->right);
+            removedNodeColor = minNode->color;
+            child = minNode->right;
+
+            if (minNode->parent == nodeToDelete) {
+                child->parent = minNode;
+            }
+            else {
+                transplant(minNode, minNode->right);
+                minNode->right = nodeToDelete->right;
+                minNode->right->parent = minNode;
+            }
+
+            transplant(nodeToDelete, minNode);
+            minNode->left = nodeToDelete->left;
+            minNode->left->parent = minNode;
+            minNode->color = nodeToDelete->color;
+        }
+
+        delete nodeToDelete;
+
+        if (removedNodeColor == true) {
+            rebalanceErase(child);
+        }
+    }
+
+    void eraseNodeWithReplacementPredecessor(Node* nodeToDelete) {
+        Node* child;
+        bool removedNodeColor = nodeToDelete->color;
+
+        if (nodeToDelete->left == _nil) {
+            child = nodeToDelete->right;
+            transplant(nodeToDelete, nodeToDelete->right);
+        }
+        else if (nodeToDelete->right == _nil) {
+            child = nodeToDelete->left;
+            transplant(nodeToDelete, nodeToDelete->left);
+        }
+        else {
+            Node* maxNode = findMax(nodeToDelete->left);
+            removedNodeColor = maxNode->color;
+            child = maxNode->left;
+
+            if (maxNode->parent == nodeToDelete) {
+                child->parent = maxNode;
+            }
+            else {
+                transplant(maxNode, maxNode->left);
+                maxNode->left = nodeToDelete->left;
+                maxNode->left->parent = maxNode;
+            }
+
+            transplant(nodeToDelete, maxNode);
+            maxNode->right = nodeToDelete->right;
+            maxNode->right->parent = maxNode;
+            maxNode->color = nodeToDelete->color;
+        }
+
+        delete nodeToDelete;
+
+        if (removedNodeColor == true) {
+            rebalanceErase(child);
+        }
+    }
+
+    void rebalanceErase(Node* node) {
+        while (node != _root && node->IsBlack()) {
+            Node* brother;
+            if (node == node->parent->left) {
+                brother = node->parent->right;
+                if (brother->IsRed()) {
+                    brother->PaintBlack();
+                    node->parent->PaintRed();
+                    rotateLeft(node->parent);
+                    brother = node->parent->right;
+                }
+                if (brother->left->IsBlack() && brother->right->IsBlack()) {
+                    brother->PaintRed();
+                    node = node->parent;
+                }
+                else {
+                    if (brother->right->IsBlack()) {
+                        brother->left->PaintBlack();
+                        brother->PaintRed();
+                        rotateRight(brother);
+                        brother = node->parent->right;
+                    }
+                    brother->color = node->parent->color;
+                    node->parent->PaintBlack();
+                    brother->right->PaintBlack();
+                    rotateLeft(node->parent);
+                    node = _root;
+                }
+            }
+            else {
+                brother = node->parent->left;
+                if (brother->IsRed()) {
+                    brother->PaintBlack();
+                    node->parent->PaintRed();
+                    rotateRight(node->parent);
+                    brother = node->parent->left;
+                }
+                if (brother->left->IsBlack() && brother->right->IsBlack()) {
+                    brother->PaintRed();
+                    node = node->parent;
+                }
+                else {
+                    if (brother->left->IsBlack()) {
+                        brother->right->PaintBlack();
+                        brother->PaintRed();
+                        rotateLeft(brother);
+                        brother = node->parent->left;
+                    }
+                    brother->color = node->parent->color;
+                    node->parent->PaintBlack();
+                    brother->left->PaintBlack();
+                    rotateRight(node->parent);
+                    node = _root;
+                }
+            }
+        }
+        node->PaintBlack();
     }
 
     Node* clear(Node* node) {
@@ -215,7 +375,7 @@ private:
         }
 
         fmt::print(fmt::fg(fmt::color::aquamarine), "{}", cpref);
-        if (node->isRed()) {
+        if (node->IsRed()) {
             fmt::print(CONSOLE_RED_COLOR, "R:{}\n", node->key);
         }
         else {
