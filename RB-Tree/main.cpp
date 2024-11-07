@@ -20,11 +20,16 @@ int main() {
                                            std::string(1, static_cast<char>(75 + i)));
     }*/
 
+    auto find1 = rbTree.Find(60);
+    auto find2 = rbTree.Find(48);
+
     rbTree.Print();
-    rbTree.Erase(16);
+    rbTree.Erase(48);
     rbTree.Print();
     rbTree.Erase(15);
     rbTree.Print();
+
+    rbTree.Clear();
 
     /*LlRbTree llRbTree;
 

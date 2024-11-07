@@ -40,6 +40,10 @@ public:
         this->color = RED;
     }
 
+    static bool IsColorBlack(bool color) {
+        return color == BLACK;
+    }
+
 private:
     constexpr static bool RED = false;
     constexpr static bool BLACK = true;

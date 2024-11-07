@@ -5,6 +5,7 @@
 
 
 #include <fmt/color.h>
+#include <optional>
 #include "Node.h"
 
 class RbTree {
@@ -27,15 +28,30 @@ public:
         insertNode(newNode);
     }
 
-    void Erase(int key) {
-        Node* nodeToDelete = searchHelper(_root, key);
-        if (nodeToDelete->key == key) {
+    void Erase(const int& key) {
+        Node* nodeToDelete = findNode(_root, key);
+        if (nodeToDelete != _nil) {
             eraseNodeWithReplacementPredecessor(nodeToDelete);
         }
     }
 
+    std::string Find(const int& key) {
+        Node* node = findNode(_root, key);
+        if (node == _nil) return {};
+        return node->value;
+    }
+
+    /*std::optional<std::string> Find(const int& key) {
+        Node* node = searchHelper(_root, key);
+        if (node == _nil || node->key != key) {
+            return std::nullopt;
+        }
+        return node->value;
+    }*/
+
     void Clear() {
         _root = clear(_root);
+        _nil->parent = nullptr;
     }
 
     void Print() {
@@ -122,28 +138,25 @@ private:
         node->parent = rightNode;
     }
 
-    Node* searchHelper(Node* node, int key) {
-        if (node == _nil || key == node->key) {
-            return node;
+    Node* findNode(Node* node, const int& key) {
+        while (node != _nil && node->key != key) {
+            node = (key < node->key) ? node->left : node->right;
         }
-        else if (key < node->key) {
-            if (node->left == _nil) {
-                return node;
-            }
+        return node;
+    }
 
-            return searchHelper(node->left, key);
-        }
-        else {
-            if (node->right == _nil) {
-                return node;
-            }
+    Node* findParent(Node* node, const int& key) {
+        Node* parent = _nil;
 
-            return searchHelper(node->right, key);
+        while (node != _nil && node->key != key) {
+            parent = node;
+            node = (key < node->key) ? node->left : node->right;
         }
+        return parent;
     }
 
     void insertNode(Node* newNode) {
-        Node* newNodeParent = searchHelper(_root, newNode->key);
+        Node* newNodeParent = findParent(_root, newNode->key);
 
         if (newNode->key == newNodeParent->key) {
             return;
@@ -166,7 +179,7 @@ private:
     void rebalanceInsert(Node* node) {
         while (node->parent->IsRed()) {
             Node* grandpa = node->parent->parent;
-            Node* uncle = grandpa->left == node->parent ? grandpa->right : grandpa->left;
+            Node* uncle = (grandpa->left == node->parent) ? grandpa->right : grandpa->left;
 
             if (uncle->IsRed()) {
                 node->parent->PaintBlack();
@@ -200,60 +213,21 @@ private:
     }
 
     Node* findMin(Node* node) {
-        return node->left != _nil ? findMin(node->left) : node;
+        return (node->left != _nil) ? findMin(node->left) : node;
     }
 
     Node* findMax(Node* node) {
-        return node->right != _nil ? findMax(node->right) : node;
+        return (node->right != _nil) ? findMax(node->right) : node;
     }
 
-    void transplant(Node* toNode, Node* fromNode) {
-        if (toNode->parent == _nil)
-            _root = fromNode;
-        else if (toNode == toNode->parent->left)
-            toNode->parent->left = fromNode;
+    void replaceSubtree(Node* oldSubtree, Node* newSubtree) {
+        if (oldSubtree->parent == _nil)
+            _root = newSubtree;
+        else if (oldSubtree == oldSubtree->parent->left)
+            oldSubtree->parent->left = newSubtree;
         else
-            toNode->parent->right = fromNode;
-        fromNode->parent = toNode->parent;
-    }
-
-    void eraseNodeWithReplacementSuccessor(Node* nodeToDelete) {
-        Node* child;
-        bool removedNodeColor = nodeToDelete->color;
-
-        if (nodeToDelete->left == _nil) {
-            child = nodeToDelete->right;
-            transplant(nodeToDelete, nodeToDelete->right);
-        }
-        else if (nodeToDelete->right == _nil) {
-            child = nodeToDelete->left;
-            transplant(nodeToDelete, nodeToDelete->left);
-        }
-        else {
-            Node* minNode = findMin(nodeToDelete->right);
-            removedNodeColor = minNode->color;
-            child = minNode->right;
-
-            if (minNode->parent == nodeToDelete) {
-                child->parent = minNode;
-            }
-            else {
-                transplant(minNode, minNode->right);
-                minNode->right = nodeToDelete->right;
-                minNode->right->parent = minNode;
-            }
-
-            transplant(nodeToDelete, minNode);
-            minNode->left = nodeToDelete->left;
-            minNode->left->parent = minNode;
-            minNode->color = nodeToDelete->color;
-        }
-
-        delete nodeToDelete;
-
-        if (removedNodeColor == true) {
-            rebalanceErase(child);
-        }
+            oldSubtree->parent->right = newSubtree;
+        newSubtree->parent = oldSubtree->parent;
     }
 
     void eraseNodeWithReplacementPredecessor(Node* nodeToDelete) {
@@ -262,11 +236,11 @@ private:
 
         if (nodeToDelete->left == _nil) {
             child = nodeToDelete->right;
-            transplant(nodeToDelete, nodeToDelete->right);
+            replaceSubtree(nodeToDelete, nodeToDelete->right);
         }
         else if (nodeToDelete->right == _nil) {
             child = nodeToDelete->left;
-            transplant(nodeToDelete, nodeToDelete->left);
+            replaceSubtree(nodeToDelete, nodeToDelete->left);
         }
         else {
             Node* maxNode = findMax(nodeToDelete->left);
@@ -277,12 +251,12 @@ private:
                 child->parent = maxNode;
             }
             else {
-                transplant(maxNode, maxNode->left);
+                replaceSubtree(maxNode, maxNode->left);
                 maxNode->left = nodeToDelete->left;
                 maxNode->left->parent = maxNode;
             }
 
-            transplant(nodeToDelete, maxNode);
+            replaceSubtree(nodeToDelete, maxNode);
             maxNode->right = nodeToDelete->right;
             maxNode->right->parent = maxNode;
             maxNode->color = nodeToDelete->color;
@@ -290,7 +264,46 @@ private:
 
         delete nodeToDelete;
 
-        if (removedNodeColor == true) {
+        if (Node::IsColorBlack(removedNodeColor)) {
+            rebalanceErase(child);
+        }
+    }
+
+    void eraseNodeWithReplacementSuccessor(Node* nodeToDelete) {
+        Node* child;
+        bool removedNodeColor = nodeToDelete->color;
+
+        if (nodeToDelete->left == _nil) {
+            child = nodeToDelete->right;
+            replaceSubtree(nodeToDelete, nodeToDelete->right);
+        }
+        else if (nodeToDelete->right == _nil) {
+            child = nodeToDelete->left;
+            replaceSubtree(nodeToDelete, nodeToDelete->left);
+        }
+        else {
+            Node* minNode = findMin(nodeToDelete->right);
+            removedNodeColor = minNode->color;
+            child = minNode->right;
+
+            if (minNode->parent == nodeToDelete) {
+                child->parent = minNode;
+            }
+            else {
+                replaceSubtree(minNode, minNode->right);
+                minNode->right = nodeToDelete->right;
+                minNode->right->parent = minNode;
+            }
+
+            replaceSubtree(nodeToDelete, minNode);
+            minNode->left = nodeToDelete->left;
+            minNode->left->parent = minNode;
+            minNode->color = nodeToDelete->color;
+        }
+
+        delete nodeToDelete;
+
+        if (Node::IsColorBlack(removedNodeColor)) {
             rebalanceErase(child);
         }
     }
