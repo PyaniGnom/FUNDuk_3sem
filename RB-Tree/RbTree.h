@@ -6,6 +6,7 @@
 
 #include <fmt/color.h>
 #include <optional>
+#include <sstream>
 #include "Node.h"
 
 class RbTree {
@@ -61,23 +62,23 @@ public:
 
     /// Прямой обход дерева
     std::string GetPreOrderTraversalString() {
-        std::string result {};
+        std::stringstream result {};
         preOrder(_root, result);
-        return result;
+        return result.str();
     }
 
     /// Обратный обход дерева
     std::string GetPostOrderTraversalString() {
-        std::string result {};
+        std::stringstream result {};
         postOrder(_root, result);
-        return result;
+        return result.str();
     }
 
     /// Симметричный обход дерева
     std::string GetInOrderTraversalString() {
-        std::string result {};
+        std::stringstream result {};
         inOrder(_root, result);
-        return result;
+        return result.str();
     }
 
 private:
@@ -90,7 +91,7 @@ private:
     Node* _root;
     Node* _nil;
 
-    // правый поворот вокруг некоторого узла
+    /// Правый поворот вокруг некоторого узла
     void rotateRight(Node* node) {
         Node* leftNode = node->left;
 
@@ -114,7 +115,7 @@ private:
         node->parent = leftNode;
     }
 
-    // левый поворот вокруг некоторого узла
+    /// Левый поворот вокруг некоторого узла
     void rotateLeft(Node* node) {
         Node* rightNode = node->right;
 
@@ -212,10 +213,12 @@ private:
         _root->PaintBlack();
     }
 
+    /// Нахождение узла с минимальным ключом в поддереве
     Node* findMin(Node* node) {
         return (node->left != _nil) ? findMin(node->left) : node;
     }
 
+    /// Нахождение узла с максимальным ключом в поддереве
     Node* findMax(Node* node) {
         return (node->right != _nil) ? findMax(node->right) : node;
     }
@@ -310,61 +313,70 @@ private:
 
     void rebalanceErase(Node* node) {
         while (node != _root && node->IsBlack()) {
-            Node* brother;
             if (node == node->parent->left) {
-                brother = node->parent->right;
-                if (brother->IsRed()) {
-                    brother->PaintBlack();
-                    node->parent->PaintRed();
-                    rotateLeft(node->parent);
-                    brother = node->parent->right;
-                }
-                if (brother->left->IsBlack() && brother->right->IsBlack()) {
-                    brother->PaintRed();
-                    node = node->parent;
-                }
-                else {
-                    if (brother->right->IsBlack()) {
-                        brother->left->PaintBlack();
-                        brother->PaintRed();
-                        rotateRight(brother);
-                        brother = node->parent->right;
-                    }
-                    brother->color = node->parent->color;
-                    node->parent->PaintBlack();
-                    brother->right->PaintBlack();
-                    rotateLeft(node->parent);
-                    node = _root;
-                }
+                node = handleLeftRebalanceErase(node);
             }
             else {
-                brother = node->parent->left;
-                if (brother->IsRed()) {
-                    brother->PaintBlack();
-                    node->parent->PaintRed();
-                    rotateRight(node->parent);
-                    brother = node->parent->left;
-                }
-                if (brother->left->IsBlack() && brother->right->IsBlack()) {
-                    brother->PaintRed();
-                    node = node->parent;
-                }
-                else {
-                    if (brother->left->IsBlack()) {
-                        brother->right->PaintBlack();
-                        brother->PaintRed();
-                        rotateLeft(brother);
-                        brother = node->parent->left;
-                    }
-                    brother->color = node->parent->color;
-                    node->parent->PaintBlack();
-                    brother->left->PaintBlack();
-                    rotateRight(node->parent);
-                    node = _root;
-                }
+                node = handleRightRebalanceErase(node);
             }
         }
         node->PaintBlack();
+    }
+
+    Node* handleLeftRebalanceErase(Node* node) {
+        Node* brother = node->parent->right;
+        if (brother->IsRed()) {
+            brother->PaintBlack();
+            node->parent->PaintRed();
+            rotateLeft(node->parent);
+            brother = node->parent->right;
+        }
+        if (brother->left->IsBlack() && brother->right->IsBlack()) {
+            brother->PaintRed();
+            node = node->parent;
+        }
+        else {
+            if (brother->right->IsBlack()) {
+                brother->left->PaintBlack();
+                brother->PaintRed();
+                rotateRight(brother);
+                brother = node->parent->right;
+            }
+            brother->color = node->parent->color;
+            node->parent->PaintBlack();
+            brother->right->PaintBlack();
+            rotateLeft(node->parent);
+            node = _root;
+        }
+        return node;
+    }
+
+    Node* handleRightRebalanceErase(Node* node) {
+        Node* brother = node->parent->left;
+        if (brother->IsRed()) {
+            brother->PaintBlack();
+            node->parent->PaintRed();
+            rotateRight(node->parent);
+            brother = node->parent->left;
+        }
+        if (brother->left->IsBlack() && brother->right->IsBlack()) {
+            brother->PaintRed();
+            node = node->parent;
+        }
+        else {
+            if (brother->left->IsBlack()) {
+                brother->right->PaintBlack();
+                brother->PaintRed();
+                rotateLeft(brother);
+                brother = node->parent->left;
+            }
+            brother->color = node->parent->color;
+            node->parent->PaintBlack();
+            brother->left->PaintBlack();
+            rotateRight(node->parent);
+            node = _root;
+        }
+        return node;
     }
 
     Node* clear(Node* node) {
@@ -400,27 +412,27 @@ private:
         }
     }
 
-    void preOrder(const Node* node, std::string& result) {
+    void preOrder(const Node* node, std::stringstream& result) {
         if (node == _nil) return;
 
-        result += std::to_string(node->key) + " ";
+        result << node->key << " ";
         preOrder(node->left, result);
         preOrder(node->right, result);
     }
 
-    void postOrder(const Node* node, std::string& result) {
+    void postOrder(const Node* node, std::stringstream& result) {
         if (node == _nil) return;
 
         postOrder(node->left, result);
         postOrder(node->right, result);
-        result += std::to_string(node->key) + " ";
+        result << node->key << " ";
     }
 
-    void inOrder(const Node* node, std::string& result) {
+    void inOrder(const Node* node, std::stringstream& result) {
         if (node == _nil) return;
 
         inOrder(node->left, result);
-        result += std::to_string(node->key) + " ";
+        result << node->key << " ";
         inOrder(node->right, result);
     }
 };

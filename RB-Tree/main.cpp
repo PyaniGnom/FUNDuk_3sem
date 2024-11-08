@@ -23,8 +23,14 @@ int main() {
     auto find1 = rbTree.Find(60);
     auto find2 = rbTree.Find(48);
 
+    auto preOrderTraversalString = rbTree.GetPreOrderTraversalString();
+
+    fmt::print("\n{}\n", preOrderTraversalString);
+
     rbTree.Print();
-    rbTree.Erase(48);
+    rbTree.Erase(16);
+    rbTree.Print();
+    rbTree.Erase(18);
     rbTree.Print();
     rbTree.Erase(15);
     rbTree.Print();

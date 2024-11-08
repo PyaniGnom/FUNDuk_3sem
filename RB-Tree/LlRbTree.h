@@ -5,6 +5,7 @@
 
 
 #include <fmt/color.h>
+#include <sstream>
 #include "Node.h"
 
 class LlRbTree {
@@ -50,23 +51,23 @@ public:
 
     /// Прямой обход дерева
     std::string GetPreOrderTraversalString() {
-        std::string result {};
+        std::stringstream result {};
         preOrder(_root, result);
-        return result;
+        return result.str();
     }
 
     /// Обратный обход дерева
     std::string GetPostOrderTraversalString() {
-        std::string result {};
+        std::stringstream result {};
         postOrder(_root, result);
-        return result;
+        return result.str();
     }
 
     /// Симметричный обход дерева
     std::string GetInOrderTraversalString() {
-        std::string result {};
+        std::stringstream result {};
         inOrder(_root, result);
-        return result;
+        return result.str();
     }
 
 private:
@@ -259,27 +260,27 @@ private:
         }
     }
 
-    void preOrder(const Node* node, std::string& result) {
+    void preOrder(const Node* node, std::stringstream& result) {
         if (node == _nil) return;
 
-        result += std::to_string(node->key) + " ";
+        result << node->key << " ";
         preOrder(node->left, result);
         preOrder(node->right, result);
     }
 
-    void postOrder(const Node* node, std::string& result) {
+    void postOrder(const Node* node, std::stringstream& result) {
         if (node == _nil) return;
 
         postOrder(node->left, result);
         postOrder(node->right, result);
-        result += std::to_string(node->key) + " ";
+        result << node->key << " ";
     }
 
-    void inOrder(const Node* node, std::string& result) {
+    void inOrder(const Node* node, std::stringstream& result) {
         if (node == _nil) return;
 
         inOrder(node->left, result);
-        result += std::to_string(node->key) + " ";
+        result << node->key << " ";
         inOrder(node->right, result);
     }
 };
