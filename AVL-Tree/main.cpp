@@ -1,11 +1,9 @@
-#include <fmt/color.h>
-#include <map>
 #include "AvlTree.h"
 
 int main() {
-    AvlTree<int> tree;
+    AvlTree tree;
 
-    for (int i = 1; i < 11; ++i) {
+    for (int i = 1; i <= 10; ++i) {
         tree.Insert(i);
     }
 
@@ -18,13 +16,6 @@ int main() {
     tree.Print();
 
     tree.Clear();
-
-    auto container = new std::map<int, std::string>();
-
-    container->insert({{2, "DVA"}, {3, "TRI"}});
-    container->erase(2);
-
-    delete container;
 
     return 0;
 }
