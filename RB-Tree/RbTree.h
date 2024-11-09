@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 #ifndef RB_TREE_RBTREE_H
 #define RB_TREE_RBTREE_H
 
@@ -42,8 +40,8 @@ public:
         return node->value;
     }
 
-    /*std::optional<std::string> Find(const int& key) {
-        Node* node = searchHelper(_root, key);
+    /*td::optional<std::string> Find(const int& key) {
+        Node* node = findNode(_root, key);
         if (node == _nil || node->key != key) {
             return std::nullopt;
         }
@@ -215,21 +213,32 @@ private:
 
     /// Нахождение узла с минимальным ключом в поддереве
     Node* findMin(Node* node) {
-        return (node->left != _nil) ? findMin(node->left) : node;
+        while (node->left != _nil) {
+            node = node->left;
+        }
+        return node;
+        //return (node->left != _nil) ? findMin(node->left) : node;
     }
 
     /// Нахождение узла с максимальным ключом в поддереве
     Node* findMax(Node* node) {
-        return (node->right != _nil) ? findMax(node->right) : node;
+        while (node->right != _nil) {
+            node = node->right;
+        }
+        return node;
+        //return (node->right != _nil) ? findMax(node->right) : node;
     }
 
     void replaceSubtree(Node* oldSubtree, Node* newSubtree) {
-        if (oldSubtree->parent == _nil)
+        if (oldSubtree->parent == _nil) {
             _root = newSubtree;
-        else if (oldSubtree == oldSubtree->parent->left)
+        }
+        else if (oldSubtree == oldSubtree->parent->left) {
             oldSubtree->parent->left = newSubtree;
-        else
+        }
+        else {
             oldSubtree->parent->right = newSubtree;
+        }
         newSubtree->parent = oldSubtree->parent;
     }
 
@@ -439,4 +448,3 @@ private:
 
 
 #endif //RB_TREE_RBTREE_H
-#pragma clang diagnostic pop
