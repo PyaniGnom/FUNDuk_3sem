@@ -9,6 +9,8 @@
 #include <boost/regex.hpp>
 #include "RbTree.h"
 #include "Key.h"
+#include "RegexUtils.h"
+#include "ConsoleColors.h"
 
 class FileHandler {
 public:
@@ -18,7 +20,7 @@ public:
 
     ~FileHandler() = default;
 
-    bool ReadInfo(RbTree& tree) {
+    bool ReadFileIntoTree(RbTree& tree) {
         std::ifstream file(_fileName);
 
         if (!file.is_open()) {
@@ -27,18 +29,18 @@ public:
         }
 
         Key tempKey;
-        std::string tempStr;
-        int stringIndex = 1;
+        std::string tempStr {};
+        int lineNumber = 1;
 
         while (getline(file, tempStr)) {
             if (tempStr.empty() || tempStr[0] == '#') continue;
             erase(tempStr, '\r');
             erase(tempStr, ' ');
 
-            if (!IsLineParsed(tempStr)) {
+            if (!IsMatch(Pattern::FILE_STRING, tempStr)) {
                 fmt::print(CONSOLE_RED_COLOR, "Невозможно обработать строку №{}: \"{}\"\n",
-                           stringIndex + 1, tempStr);
-                return false;
+                           lineNumber, tempStr);
+                continue;
             }
 
             tempKey.Surname = tempStr.substr(0, tempStr.find(';'));
@@ -49,15 +51,15 @@ public:
             tempStr.erase(0, tempStr.find(';') + 1);
             tempKey.StateNumber = tempStr.substr(0, tempStr.find(';'));
 
-            tree.Insert(tempKey, stringIndex);
-            ++stringIndex;
+            tree.Insert(tempKey, lineNumber);
+            ++lineNumber;
         }
 
         file.close();
         return true;
     }
 
-    bool WriteInfo(RbTree& tree) {
+    bool WriteTreeIntoFile(RbTree& tree) {
         std::ifstream file(_fileName);
 
         if (!file.is_open()) {
@@ -70,10 +72,10 @@ public:
 
 private:
     std::string _fileName;
-    constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
-    const inline static boost::wregex PATTERN = boost::wregex(L"(^([А-ЯЁ][а-яё]{1,29};){2}([А-ЯЁ][а-яё]{1,29}|-| )?;[АВЕКМНОРСТУХ]\\d{3}(?<!000)[АВЕКМНОРСТУХ]{2}\\d{2,3}(?<!00);$)", boost::regex::perl);
+//    constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
+//    const inline static boost::wregex PATTERN = boost::wregex(L"(^([А-ЯЁ][а-яё]{1,29};){2}([А-ЯЁ][а-яё]{1,29}|-| )?;[АВЕКМНОРСТУХ]\\d{3}(?<!000)[АВЕКМНОРСТУХ]{2}\\d{2,3}(?<!00);$)", boost::regex::perl);
 
-    static bool IsLineParsed(const std::string& str) {
+    /*static bool IsLineParsed(const std::string& str) {
         std::wstring wide_str = StringToWString(str);
 
         bool match = boost::regex_match(wide_str, PATTERN);
@@ -85,7 +87,7 @@ private:
         std::wstring wide_str = converter.from_bytes(str);
 
         return wide_str;
-    }
+    }*/
 };
 
 

@@ -2,11 +2,11 @@
 #define LABA_2_RBTREE_H
 
 
-#include <fmt/color.h>
-#include <optional>
 #include <sstream>
 #include <utility>
+#include <fmt/color.h>
 #include "Node.h"
+#include "ConsoleColors.h"
 
 class RbTree {
 public:
@@ -41,14 +41,6 @@ public:
         return node->value;
     }
 
-    /*std::optional<int> Find(const Key& key) {
-        Node* node = findNode(_root, key);
-        if (node == _nil || node->key != key) {
-            return std::nullopt;
-        }
-        return node->value;
-    }*/
-
     void Clear() {
         _root = clear(_root);
         _nil->parent = nullptr;
@@ -69,8 +61,6 @@ private:
     constexpr static std::string CH_UP_HOR = "\u2514\u2500";       // "└─"
     constexpr static std::string CH_DOWN_HOR = "\u250C\u2500";     // "┌─"
     constexpr static std::string CH_VER = "\u2502 ";               // "│ "
-    constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
-    constexpr static fmt::text_style CONSOLE_BLACK_COLOR = fmt::fg(fmt::color::dark_gray);
 
     Node* _root;
     Node* _nil;
