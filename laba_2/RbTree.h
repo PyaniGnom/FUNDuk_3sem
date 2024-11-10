@@ -59,6 +59,12 @@ public:
         print(_root);
     }
 
+    std::stringstream GetPostOrderTraversal() {
+        std::stringstream result {};
+        postOrder(_root, result);
+        return result;
+    }
+
 private:
     constexpr static std::string CH_UP_HOR = "\u2514\u2500";       // "└─"
     constexpr static std::string CH_DOWN_HOR = "\u250C\u2500";     // "┌─"
@@ -358,6 +364,14 @@ private:
         if (node->left != _nil) {
             print(node->left, lpref + CH_VER, lpref + CH_UP_HOR, lpref + "  ");
         }
+    }
+
+    void postOrder(const Node* node, std::stringstream& result) {
+        if (node == _nil) return;
+
+        postOrder(node->left, result);
+        postOrder(node->right, result);
+        result << node->key << "\n";
     }
 };
 

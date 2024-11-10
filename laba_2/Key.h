@@ -41,6 +41,11 @@ struct Key {
         if (MiddleName != otherKey.MiddleName) return MiddleName > otherKey.MiddleName;
         return StateNumber > otherKey.StateNumber;
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Key& key) {
+        os << key.Surname << ";" << key.Name << ";" << key.MiddleName << ";" << key.StateNumber << ";";
+        return os;
+    }
 };
 
 

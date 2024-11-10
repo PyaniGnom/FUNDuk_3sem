@@ -4,10 +4,13 @@ project(laba_2)
 set(CMAKE_CXX_STANDARD 23)
 
 find_package(fmt REQUIRED)
+find_package(Boost 1.78.0 REQUIRED COMPONENTS regex)
 
-add_executable(laba_2 main.cpp
+add_executable(${PROJECT_NAME} main.cpp
         RbTree.h
         Node.h
         Key.h
+        FileHandler.h
 )
-target_link_libraries(laba_2 fmt::fmt)
+target_link_libraries(${PROJECT_NAME} fmt::fmt)
+target_link_libraries(${PROJECT_NAME} ${BOOST_LIBRARIES})
