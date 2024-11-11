@@ -1,6 +1,7 @@
 #ifndef LABA_2_FILEHANDLER_H
 #define LABA_2_FILEHANDLER_H
 
+
 #include <fstream>
 #include <string>
 #include <codecvt>
@@ -20,11 +21,11 @@ public:
 
     ~FileHandler() = default;
 
-    bool ReadFileIntoTree(RbTree& tree) {
+    bool ReadFileIntoTree(RbTree* tree) {
         std::ifstream file(_fileName);
 
         if (!file.is_open()) {
-            fmt::print(CONSOLE_RED_COLOR, "\nНе удалось открыть входной файл!\n");
+            fmt::print(CONSOLE_FAIL_COLOR, "\nНе удалось открыть входной файл!\n");
             return false;
         }
 
@@ -39,7 +40,7 @@ public:
             erase(tempStr, ' ');
 
             if (!IsMatch(Pattern::FILE_STRING, tempStr)) {
-                fmt::print(CONSOLE_RED_COLOR, "Невозможно обработать строку №{}: \"{}\"\n",
+                fmt::print(CONSOLE_FAIL_COLOR, "Невозможно обработать строку №{}: \"{}\"\n",
                            lineNumber, tempStr);
                 continue;
             }
@@ -53,12 +54,12 @@ public:
             tempKey.StateNumber = tempStr.substr(0, tempStr.find(';'));
 
             if (!tempKey.IsValid()) {
-                fmt::print(CONSOLE_RED_COLOR, "Входной ключ в строке №{} некорректен: \"{}\"\n",
+                fmt::print(CONSOLE_FAIL_COLOR, "Входной ключ в строке №{} некорректен: \"{}\"\n",
                            lineNumber, tempStr);
                 continue;
             }
 
-            tree.Insert(tempKey, lineNumber);
+            tree->Insert(tempKey, lineNumber);
         }
 
         file.close();
@@ -69,7 +70,7 @@ public:
         std::ifstream file(_fileName);
 
         if (!file.is_open()) {
-            fmt::print(CONSOLE_RED_COLOR, "\nНе удалось открыть входной файл!\n");
+            fmt::print(CONSOLE_FAIL_COLOR, "\nНе удалось открыть входной файл!\n");
             return false;
         }
 

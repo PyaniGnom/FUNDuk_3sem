@@ -35,6 +35,13 @@ static std::wstring StringToWString(const std::string& str) {
     return wide_str;
 }
 
+static std::string WStringToString(std::wstring& wide_str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+    std::string str = converter.to_bytes(wide_str);
+
+    return str;
+}
+
 static bool IsMatch(const Pattern pattern, const std::string& str) {
     auto it = patternMap.find(pattern);
 

@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <utility>
 #include <boost/regex.hpp>
 #include "RegexUtils.h"
 
@@ -13,14 +14,14 @@ public:
     std::string MiddleName;
     std::string StateNumber;
 
+    Key() : Surname {}, Name {}, MiddleName {}, StateNumber {} {}
+
     Key(std::string surname, std::string name, std::string middleName, std::string stateNumber) {
         Surname = std::move(surname);
         Name = std::move(name);
         MiddleName = std::move(middleName);
         StateNumber = std::move(stateNumber);
     }
-
-    Key() : Surname {}, Name {}, MiddleName {}, StateNumber {} {}
 
     bool operator==(const Key& otherKey) const {
         return Surname == otherKey.Surname && Name == otherKey.Name &&

@@ -21,23 +21,25 @@ public:
         delete _nil;
     }
 
-    void Insert(Key key, int value) {
+    bool Insert(Key key, int value) {
         Node* newNode = new Node(std::move(key), value);
         newNode->left = _nil;
         newNode->right = _nil;
-        insertNode(newNode);
+        return insertNode(newNode);
     }
 
-    void Erase(const Key& key) {
+    bool Erase(const Key& key, const int& value) {
         Node* nodeToDelete = findNode(_root, key);
-        if (nodeToDelete != _nil) {
+        if (nodeToDelete != _nil && nodeToDelete->value == value) {
             eraseNode(nodeToDelete);
+            return true;
         }
+        return false;
     }
 
     int Find(const Key& key) {
         Node* node = findNode(_root, key);
-        if (node == _nil) return {};
+        if (node == _nil) return -1;
         return node->value;
     }
 
@@ -47,8 +49,11 @@ public:
     }
 
     void Print() {
-        fmt::print("\n");
         print(_root);
+    }
+
+    bool IsExist() {
+        return _root != _nil;
     }
 
     std::stringstream GetPostOrderTraversal() {
@@ -130,25 +135,26 @@ private:
         return parent;
     }
 
-    void insertNode(Node* newNode) {
+    bool insertNode(Node* newNode) {
         Node* newNodeParent = findParent(_root, newNode->key);
 
-        if (newNode->key == newNodeParent->key) {
-            return;
-        }
-
-        if (newNodeParent == _nil) {
+        if (newNodeParent == _nil && _root == _nil) {
             _root = newNode;
         }
-        else if (newNode->key < newNodeParent->key) {
+        else if (newNode->key < newNodeParent->key && newNodeParent->left == _nil) {
             newNodeParent->left = newNode;
         }
-        else {
+        else if (newNode->key > newNodeParent->key && newNodeParent->right == _nil) {
             newNodeParent->right = newNode;
+        }
+        else {
+            return false;
         }
 
         newNode->parent = newNodeParent;
         rebalanceInsert(newNode);
+
+        return true;
     }
 
     void rebalanceInsert(Node* node) {
