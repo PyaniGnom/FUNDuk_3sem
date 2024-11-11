@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 find_package(fmt REQUIRED)
 
-add_executable(AVL_Tree main.cpp
+add_executable(${PROJECT_NAME} main.cpp
         AvlTree.h
 )
-target_link_libraries(AVL_Tree fmt::fmt)
+target_link_libraries(${PROJECT_NAME} fmt::fmt)

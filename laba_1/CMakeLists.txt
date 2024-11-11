@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 find_package(fmt REQUIRED)
 
-add_executable(Linked_List main.cpp
+add_executable(${PROJECT_NAME} main.cpp
         List.cpp
-        List.h)
-target_link_libraries(Linked_List fmt::fmt)
+        List.h
+)
+target_link_libraries(${PROJECT_NAME} fmt::fmt)

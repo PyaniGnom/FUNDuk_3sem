@@ -3,15 +3,15 @@
 #include <fmt/color.h>
 #include "List.h"
 
-const fmt::text_style AQUA_COLOR = fg(fmt::color::aqua);
-const fmt::text_style INDIAN_RED_COLOR = fg(fmt::color::indian_red);
-const fmt::text_style FOREST_GREEN_COLOR = fg(fmt::color::forest_green);
-const int MENU_ITEMS_COUNT = 10;
+constexpr fmt::text_style AQUA_COLOR = fg(fmt::color::aqua);
+constexpr fmt::text_style INDIAN_RED_COLOR = fg(fmt::color::indian_red);
+constexpr fmt::text_style FOREST_GREEN_COLOR = fg(fmt::color::forest_green);
+constexpr int MENU_ITEMS_COUNT = 10;
 
-int RandomGenerator() {
+int GenerateRandomInt(int min, int max) {
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist(0, 100);
+    std::uniform_int_distribution<int> dist(min, max);
 
     return dist(mt);
 }
@@ -62,7 +62,7 @@ List* CreateList() {
 
     List* list = new List();
     for (int i = 0; i < size; ++i) {
-        list->PushFront(RandomGenerator());
+        list->PushFront(GenerateRandomInt(0, 100));
     }
 
     return list;

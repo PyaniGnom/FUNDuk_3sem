@@ -31,7 +31,7 @@ public:
     void Erase(const Key& key) {
         Node* nodeToDelete = findNode(_root, key);
         if (nodeToDelete != _nil) {
-            eraseNodeWithReplacementPredecessor(nodeToDelete);
+            eraseNode(nodeToDelete);
         }
     }
 
@@ -187,14 +187,6 @@ private:
         _root->PaintBlack();
     }
 
-    /// Нахождение узла с минимальным ключом в поддереве
-    Node* findMin(Node* node) {
-        while (node->left != _nil) {
-            node = node->left;
-        }
-        return node;
-    }
-
     /// Нахождение узла с максимальным ключом в поддереве
     Node* findMax(Node* node) {
         while (node->right != _nil) {
@@ -216,7 +208,7 @@ private:
         newSubtree->parent = oldSubtree->parent;
     }
 
-    void eraseNodeWithReplacementPredecessor(Node* nodeToDelete) {
+    void eraseNode(Node* nodeToDelete) {
         Node* child;
         bool removedNodeColor = nodeToDelete->color;
 

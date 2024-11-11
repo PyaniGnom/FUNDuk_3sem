@@ -5,13 +5,7 @@
 #include "FileHandler.h"
 #include "ConsoleColors.h"
 
-int RandomGenerator(int min, int max) {
-    std::random_device rd;
-    std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist(min, max);
-
-    return dist(mt);
-}
+int GenerateRandomInt(int min, int max);
 
 int main() {
     RbTree rbTree;
@@ -25,4 +19,12 @@ int main() {
 //    fmt::print("\nОбратный обход дерева:\n{}", stream.str());
 
     return 0;
+}
+
+int GenerateRandomInt(int min, int max) {
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(min, max);
+
+    return dist(mt);
 }

@@ -402,8 +402,6 @@ private:
     }
 
     void print(Node* node, const std::string& rpref = "", const std::string& cpref = "", const std::string& lpref = "") {
-        if (node == _nil) return;
-
         if (node->right != _nil) {
             print(node->right, rpref + "  ", rpref + CH_DOWN_HOR, rpref + CH_VER);
         }
