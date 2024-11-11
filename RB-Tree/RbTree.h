@@ -54,7 +54,6 @@ public:
     }
 
     void Print() {
-        fmt::print("\n");
         print(_root);
     }
 
@@ -157,18 +156,17 @@ private:
     void insertNode(Node* newNode) {
         Node* newNodeParent = findParent(_root, newNode->key);
 
-        if (newNode->key == newNodeParent->key) {
-            return;
-        }
-
-        if (newNodeParent == _nil) {
+        if (newNodeParent == _nil && _root == _nil) {
             _root = newNode;
         }
-        else if (newNode->key < newNodeParent->key) {
+        else if (newNode->key < newNodeParent->key && newNodeParent->left == _nil) {
             newNodeParent->left = newNode;
         }
-        else {
+        else if (newNode->key > newNodeParent->key && newNodeParent->right == _nil) {
             newNodeParent->right = newNode;
+        }
+        else {
+            return;
         }
 
         newNode->parent = newNodeParent;
@@ -402,6 +400,8 @@ private:
     }
 
     void print(Node* node, const std::string& rpref = "", const std::string& cpref = "", const std::string& lpref = "") {
+        if (node == _nil) return;
+
         if (node->right != _nil) {
             print(node->right, rpref + "  ", rpref + CH_DOWN_HOR, rpref + CH_VER);
         }

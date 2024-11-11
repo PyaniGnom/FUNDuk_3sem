@@ -20,19 +20,15 @@ int main() {
                                            std::string(1, static_cast<char>(75 + i)));
     }*/
 
-    auto find1 = rbTree.Find(60);
+    /*auto find1 = rbTree.Find(60);
     auto find2 = rbTree.Find(48);
 
     auto preOrderTraversalString = rbTree.GetPreOrderTraversalString();
 
-    fmt::print("\n{}\n", preOrderTraversalString);
+    fmt::print("\n{}\n", preOrderTraversalString);*/
 
     rbTree.Print();
-    rbTree.Erase(16);
-    rbTree.Print();
-    rbTree.Erase(18);
-    rbTree.Print();
-    rbTree.Erase(15);
+    rbTree.Insert(16, "FLTD");
     rbTree.Print();
 
     rbTree.Clear();
