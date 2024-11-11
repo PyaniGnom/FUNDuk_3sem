@@ -1,7 +1,8 @@
-#include <fmt/color.h>
 #ifndef LINKED_LIST_LIST_H
 #define LINKED_LIST_LIST_H
 
+
+#include <fmt/color.h>
 
 class List {
 public:
