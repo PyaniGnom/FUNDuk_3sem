@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <codecvt>
-#include <utility>
 #include <fmt/color.h>
 #include <boost/regex.hpp>
 #include "RbTree.h"
@@ -15,14 +14,15 @@
 
 class FileHandler {
 public:
-    explicit FileHandler(std::string fileName) {
-        this->_fileName = std::move(fileName);
+    explicit FileHandler(const std::string& inputFile, const std::string& outputFile) {
+        this->_inputFileName = inputFile;
+        this->_outputFileName = outputFile;
     }
 
     ~FileHandler() = default;
 
     bool ReadFileIntoTree(RbTree* tree) {
-        std::ifstream file(_fileName);
+        std::ifstream file(_inputFileName);
 
         if (!file.is_open()) {
             fmt::print(CONSOLE_FAIL_COLOR, "\nНе удалось открыть входной файл!\n");
@@ -66,19 +66,24 @@ public:
         return true;
     }
 
-    bool WriteTreeIntoFile(RbTree& tree) {
-        std::ifstream file(_fileName);
+    bool WriteTreeIntoFile(RbTree* tree) {
+        std::ofstream file(_outputFileName);
 
         if (!file.is_open()) {
             fmt::print(CONSOLE_FAIL_COLOR, "\nНе удалось открыть входной файл!\n");
             return false;
         }
 
+        auto traversal = tree->GetPostOrderTraversal();
+        file << traversal.str();
+
+        file.close();
         return true;
     }
 
 private:
-    std::string _fileName;
+    std::string _inputFileName;
+    std::string _outputFileName;
 };
 
 

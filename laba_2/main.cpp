@@ -21,10 +21,12 @@ int main() {
     auto* rbTree = new RbTree();
     int menuNumber;
     std::string failPrompt {};
-    FileHandler fileHandler("../input_file.txt");
+    FileHandler fileHandler("../input_file.txt", "../output_file.txt");
 
     fmt::print(CONSOLE_PROCESS_COLOR, "Считывание информации из файла в дерево...\n");
-    fileHandler.ReadFileIntoTree(rbTree);
+    if (!fileHandler.ReadFileIntoTree(rbTree)) {
+        return -1;
+    }
     fmt::print(CONSOLE_DONE_COLOR, "Готово!\n");
 
     do {
@@ -167,6 +169,12 @@ int main() {
         }
     } while (menuNumber != MENU_ITEMS_COUNT);
 
+    fmt::print(CONSOLE_PROCESS_COLOR, "\nЗапись информации из дерева в файл...\n");
+    if (!fileHandler.WriteTreeIntoFile(rbTree)) {
+        return -1;
+    }
+    fmt::print(CONSOLE_DONE_COLOR, "Готово!\n");
+
     fmt::print("\nВыход... Удачного дня!\n");
     delete rbTree;
 
@@ -183,14 +191,14 @@ int GenerateRandomInt(int min, int max) {
 
 void PrintMenu() {
     fmt::print("\nМеню:\n"
-               "1. Инициализация дерева\n"      // +
-               "2. Добавление элемента\n"       // -
-               "3. Удаление элемента\n"         // -
-               "4. Поиск элемента\n"            // -
-               "5. Печать дерева\n"             // +
-               "6. Обратный обход дерева\n"     // +
-               "7. Удаление дерева\n"           // +
-               "8. TBC\n"                       // +
+               "1. Инициализация дерева\n"
+               "2. Добавление элемента\n"
+               "3. Удаление элемента\n"
+               "4. Поиск элемента\n"
+               "5. Печать дерева\n"
+               "6. Обратный обход дерева\n"
+               "7. Удаление дерева\n"
+               "8. TBC\n"
                "9. Выход\n"
                "Выберите действие (для выбора просто введите цифру):\n");
     fmt::print(CONSOLE_PROCESS_COLOR, "> ");
@@ -233,10 +241,10 @@ Key GetKeyInput() {
     key.Name = WStringToString(tempStr);
     fmt::print("Введите Отчество: ");
     std::wcin >> tempStr;
-    key.MiddleName = WStringToString(tempStr);;
+    key.MiddleName = WStringToString(tempStr);
     fmt::print("Введите Госномер: ");
     std::wcin >> tempStr;
-    key.StateNumber = WStringToString(tempStr);;
+    key.StateNumber = WStringToString(tempStr);
 
     return key;
 }
