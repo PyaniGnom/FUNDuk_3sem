@@ -27,6 +27,7 @@ public:
     }
 
     void Print() {
+        fmt::print("\n");
         print(_root);
     }
 
@@ -267,7 +268,7 @@ private:
     }
 
     // удаление узла с ключом key из дерева node с заменой на преемника
-    Node* eraseNodeWithReplacementSuccessor(Node* node, int& key) {
+    Node* eraseNodeWithReplacementSuccessor(Node* node, const int& key) {
         if (node == nullptr) {
             return nullptr;
         }
@@ -275,7 +276,7 @@ private:
             node->left = eraseNodeWithReplacementSuccessor(node->left, key);
         }
         else if (key > node->key) {
-            node->right = eraseNodeWithReplacementPredecessor(node->right, key);
+            node->right = eraseNodeWithReplacementSuccessor(node->right, key);
         }
         else {  // key == node->key
             Node* left = node->left;
