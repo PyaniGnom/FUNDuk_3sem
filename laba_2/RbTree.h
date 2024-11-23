@@ -158,9 +158,12 @@ private:
     }
 
     void rebalanceInsert(Node* node) {
+        Node* grandpa;
+        Node* uncle;
+
         while (node->parent->IsRed()) {
-            Node* grandpa = node->parent->parent;
-            Node* uncle = (grandpa->left == node->parent) ? grandpa->right : grandpa->left;
+            grandpa = node->parent->parent;
+            uncle = (grandpa->left == node->parent) ? grandpa->right : grandpa->left;
 
             if (uncle->IsRed()) {
                 node->parent->PaintBlack();
@@ -185,6 +188,7 @@ private:
                     }
                     node->parent->PaintBlack();
                     grandpa->PaintRed();
+
                     rotateLeft(grandpa);
                 }
             }
@@ -324,10 +328,10 @@ private:
     Node* clear(Node* node) {
         if (node == _nil) return _nil;
 
-        if (node->left) {
+        if (node->left != _nil) {
             node->left = clear(node->left);
         }
-        if (node->right) {
+        if (node->right != _nil) {
             node->right = clear(node->right);
         }
         delete node;

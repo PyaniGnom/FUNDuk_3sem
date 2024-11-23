@@ -53,34 +53,5 @@ static bool IsMatch(const Pattern pattern, const std::string& str) {
     return false;
 }
 
-/*static bool IsMatch(const boost::wregex& pattern, const std::string& str) {
-    std::wstring wide_str = StringToWString(str);
-
-    bool match = boost::regex_match(wide_str, pattern);
-    return match;
-}
-
-static bool IsMatch(const Pattern pattern, const std::string& str) {
-    std::wstring wide_str = StringToWString(str);
-
-    bool match;
-    if (pattern == Pattern::SURNAME || pattern == Pattern::NAME) {
-        match = boost::regex_match(wide_str, NAME_PATTERN);
-    }
-    else if (pattern == Pattern::MIDDLE_NAME) {
-        match = boost::regex_match(wide_str, MIDDLE_NAME_PATTERN);
-    }
-    else if (pattern == Pattern::STATE_NUMBER) {
-        match = boost::regex_match(wide_str, STATE_NUMBER_PATTERN);
-    }
-    else if (pattern == Pattern::FILE_STRING) {
-        match = boost::regex_match(wide_str, FILE_STRING_PATTERN);
-    }
-    else {
-        match = false;
-    }
-
-    return match;
-}*/
 
 #endif //LABA_2_REGEXUTILS_H

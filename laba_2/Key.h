@@ -4,7 +4,6 @@
 
 #include <string>
 #include <utility>
-#include <boost/regex.hpp>
 #include "RegexUtils.h"
 
 class Key {
@@ -59,23 +58,6 @@ public:
 
         return false;
     }
-
-    /*bool IsValid() {
-        if (!IsMatch(NAME_PATTERN, Surname)) {
-            return false;
-        }
-        if (!IsMatch(NAME_PATTERN, Name)) {
-            return false;
-        }
-        if (!IsMatch(MIDDLENAME_PATTERN, MiddleName)) {
-            return false;
-        }
-        if (!IsMatch(STATENUMBER_PATTERN, StateNumber)) {
-            return false;
-        }
-
-        return true;
-    }*/
 };
 
 
