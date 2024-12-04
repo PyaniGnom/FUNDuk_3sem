@@ -8,13 +8,14 @@ find_package(Boost 1.78.0 CONFIG REQUIRED COMPONENTS regex)
 
 add_executable(${PROJECT_NAME} main.cpp
         RbTree.h
+        RbTree.cpp
         Node.h
+        Node.cpp
         Key.h
         Key.cpp
         FileHandler.h
         RegexUtils.h
         ConsoleColors.h
-        Node.cpp
 )
 target_link_libraries(${PROJECT_NAME} fmt::fmt)
 target_link_libraries(${PROJECT_NAME} ${BOOST_LIBRARIES})
