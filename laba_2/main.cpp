@@ -9,7 +9,6 @@
 
 constexpr int MENU_ITEMS_COUNT = 9;
 
-int GenerateRandomInt(int min, int max);
 void PrintMenu();
 int GetNumberInput(int min, int max, const std::string& failPrompt);
 Key GetKey();
@@ -56,6 +55,7 @@ int main() {
                 Key key = GetKey();
 
                 fmt::print("\nДля добавления элемента, введите значение:\n");
+                fmt::print(CONSOLE_PROCESS_COLOR, "> ");
                 failPrompt = "Некорректное значение!\n";
                 int value = GetNumberInput(1, 1000, failPrompt);
 
@@ -181,14 +181,6 @@ int main() {
     return 0;
 }
 
-int GenerateRandomInt(int min, int max) {
-    std::random_device rd;
-    std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist(min, max);
-
-    return dist(mt);
-}
-
 void PrintMenu() {
     fmt::print("\nМеню:\n"
                "1. Инициализация дерева\n"
@@ -222,7 +214,7 @@ Key GetKey() {
     Key key = GetKeyInput();
 
     while (!key.IsValid()) {
-        fmt::print(CONSOLE_FAIL_COLOR, "\nВведённый ключ некорректен! Повторите ещё раз!\n");
+        fmt::print(CONSOLE_FAIL_COLOR, "\nВведённый ключ некорректен! Повторите ещё раз!\n\n");
         key = GetKeyInput();
     }
 
@@ -248,18 +240,3 @@ Key GetKeyInput() {
 
     return key;
 }
-
-/*Key GetKeyInput() {
-    Key key;
-
-    fmt::print("\nВведите Фамилию: ");
-    std::cin >> key.Surname;
-    fmt::print("Введите Имя: ");
-    std::cin >> key.Name;
-    fmt::print("Введите Отчество: ");
-    std::cin >> key.MiddleName;
-    fmt::print("Введите Госномер: ");
-    std::cin >> key.StateNumber;
-
-    return key;
-}*/
