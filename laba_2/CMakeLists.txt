@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME} main.cpp
         FileHandler.h
         RegexUtils.h
         ConsoleColors.h
+        Node.cpp
 )
 target_link_libraries(${PROJECT_NAME} fmt::fmt)
 target_link_libraries(${PROJECT_NAME} ${BOOST_LIBRARIES})

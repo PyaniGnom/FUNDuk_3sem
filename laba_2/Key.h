@@ -13,7 +13,7 @@ public:
     std::string MiddleName;
     std::string StateNumber;
 
-    Key() : Surname {}, Name {}, MiddleName {}, StateNumber {} {}
+    Key();
 
     bool operator==(const Key& otherKey) const;
     bool operator!=(const Key& otherKey) const;

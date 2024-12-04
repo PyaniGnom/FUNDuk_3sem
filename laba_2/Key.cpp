@@ -1,5 +1,7 @@
 #include "Key.h"
 
+Key::Key() : Surname {}, Name {}, MiddleName {}, StateNumber {} {}
+
 bool Key::operator==(const Key &otherKey) const {
     return Surname == otherKey.Surname && Name == otherKey.Name &&
            MiddleName == otherKey.MiddleName && StateNumber == otherKey.StateNumber;
