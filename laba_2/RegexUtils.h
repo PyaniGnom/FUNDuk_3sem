@@ -2,10 +2,10 @@
 #define LABA_2_REGEXUTILS_H
 
 
-#include <string>
-#include <codecvt>
-#include <unordered_map>
 #include <boost/regex.hpp>
+#include <codecvt>
+#include <string>
+#include <unordered_map>
 
 const inline static boost::wregex NAME_PATTERN = boost::wregex(L"(^[А-ЯЁ][а-яё]{1,29}$)", boost::regex::perl);
 const inline static boost::wregex MIDDLE_NAME_PATTERN = boost::wregex(L"(^([А-ЯЁ][а-яё]{1,29}|-| )?$)", boost::regex::perl);
