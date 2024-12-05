@@ -1,11 +1,11 @@
-#include <iostream>
-#include <utility>
-#include <random>
 #include <fmt/color.h>
-#include "RbTree.h"
-#include "Key.h"
-#include "FileHandler.h"
+#include <iostream>
+#include <random>
+#include <utility>
 #include "ConsoleColors.h"
+#include "FileHandler.h"
+#include "Key.h"
+#include "RbTree.h"
 
 constexpr int MENU_ITEMS_COUNT = 9;
 
