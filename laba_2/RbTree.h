@@ -68,7 +68,8 @@ private:
     Node* clear(Node* node);
 
     /// Распечатать дерево
-    void print(Node* node, const std::string& rightPref = "", const std::string& cPref = "", const std::string& leftPref = "");
+    void print(Node* node, const std::string& rightPref = "", const std::string& cPref = "",
+               const std::string& leftPref = "");
 
     /// Записать обратный обход дерева в поток строки
     void postOrder(const Node* node, std::stringstream& result);

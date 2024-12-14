@@ -1,11 +1,11 @@
 #include "FileHandler.h"
 
-FileHandler::FileHandler(const std::string &inputFile, const std::string &outputFile) {
+FileHandler::FileHandler(const std::string& inputFile, const std::string& outputFile) {
     this->_inputFileName = inputFile;
     this->_outputFileName = outputFile;
 }
 
-bool FileHandler::ReadFileIntoTree(RbTree *tree) {
+bool FileHandler::ReadFileIntoTree(RbTree* tree) {
     std::ifstream file(_inputFileName);
 
     if (!file.is_open()) {
@@ -14,8 +14,8 @@ bool FileHandler::ReadFileIntoTree(RbTree *tree) {
     }
 
     Key tempKey;
-    std::string tempStr {};
-    int lineNumber {};
+    std::string tempStr { };
+    int lineNumber { };
 
     while (getline(file, tempStr)) {
         ++lineNumber;
@@ -50,7 +50,7 @@ bool FileHandler::ReadFileIntoTree(RbTree *tree) {
     return true;
 }
 
-bool FileHandler::WriteTreeIntoFile(RbTree *tree) {
+bool FileHandler::WriteTreeIntoFile(RbTree* tree) {
     std::ofstream file(_outputFileName);
 
     if (!file.is_open()) {

@@ -1,33 +1,33 @@
 #include "Key.h"
 
-Key::Key() : Surname {}, Name {}, MiddleName {}, StateNumber {} {}
+Key::Key() : Surname { }, Name { }, MiddleName { }, StateNumber { } {}
 
-bool Key::operator==(const Key &otherKey) const {
+bool Key::operator==(const Key& otherKey) const {
     return Surname == otherKey.Surname && Name == otherKey.Name &&
            MiddleName == otherKey.MiddleName && StateNumber == otherKey.StateNumber;
 }
 
-bool Key::operator!=(const Key &otherKey) const {
+bool Key::operator!=(const Key& otherKey) const {
     return !(*this == otherKey);
 }
 
-bool Key::operator<(const Key &otherKey) const {
+bool Key::operator<(const Key& otherKey) const {
     if (Surname != otherKey.Surname) return Surname < otherKey.Surname;
     if (Name != otherKey.Name) return Name < otherKey.Name;
     if (MiddleName != otherKey.MiddleName) return MiddleName < otherKey.MiddleName;
     return StateNumber < otherKey.StateNumber;
 }
 
-std::ostream &operator<<(std::ostream &os, const Key &key) {
-    os << key.Surname << ";" << key.Name << ";" << key.MiddleName << ";" << key.StateNumber << ";";
-    return os;
-}
-
-bool Key::operator>(const Key &otherKey) const {
+bool Key::operator>(const Key& otherKey) const {
     if (Surname != otherKey.Surname) return Surname > otherKey.Surname;
     if (Name != otherKey.Name) return Name > otherKey.Name;
     if (MiddleName != otherKey.MiddleName) return MiddleName > otherKey.MiddleName;
     return StateNumber > otherKey.StateNumber;
+}
+
+std::ostream& operator<<(std::ostream& os, const Key& key) {
+    os << key.Surname << ";" << key.Name << ";" << key.MiddleName << ";" << key.StateNumber << ";";
+    return os;
 }
 
 bool Key::IsValid() {

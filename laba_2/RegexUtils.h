@@ -8,8 +8,10 @@
 #include <unordered_map>
 
 const inline static boost::wregex NAME_PATTERN = boost::wregex(L"(^[А-ЯЁ][а-яё]{1,29}$)", boost::regex::perl);
-const inline static boost::wregex MIDDLE_NAME_PATTERN = boost::wregex(L"(^([А-ЯЁ][а-яё]{1,29}|-| )?$)", boost::regex::perl);
-const inline static boost::wregex STATE_NUMBER_PATTERN = boost::wregex(L"(^[АВЕКМНОРСТУХ]\\d{3}(?<!000)[АВЕКМНОРСТУХ]{2}\\d{2,3}(?<!00)$)", boost::regex::perl);
+const inline static boost::wregex MIDDLE_NAME_PATTERN = boost::wregex(L"(^([А-ЯЁ][а-яё]{1,29}|-| )?$)",
+                                                                      boost::regex::perl);
+const inline static boost::wregex STATE_NUMBER_PATTERN = boost::wregex(
+        L"(^[АВЕКМНОРСТУХ]\\d{3}(?<!000)[АВЕКМНОРСТУХ]{2}\\d{2,3}(?<!00)$)", boost::regex::perl);
 const inline static boost::wregex FILE_STRING_PATTERN = boost::wregex(L"(^(.+;){2}.*;.+;$)", boost::regex::perl);
 
 enum class Pattern {
@@ -21,11 +23,11 @@ enum class Pattern {
 };
 
 const std::unordered_map<Pattern, const boost::wregex&> patternMap = {
-        {Pattern::SURNAME, NAME_PATTERN},
-        {Pattern::NAME, NAME_PATTERN},
-        {Pattern::MIDDLE_NAME, MIDDLE_NAME_PATTERN},
-        {Pattern::STATE_NUMBER, STATE_NUMBER_PATTERN},
-        {Pattern::FILE_STRING, FILE_STRING_PATTERN}
+        { Pattern::SURNAME,      NAME_PATTERN },
+        { Pattern::NAME,         NAME_PATTERN },
+        { Pattern::MIDDLE_NAME,  MIDDLE_NAME_PATTERN },
+        { Pattern::STATE_NUMBER, STATE_NUMBER_PATTERN },
+        { Pattern::FILE_STRING,  FILE_STRING_PATTERN }
 };
 
 static std::wstring StringToWString(const std::string& str) {

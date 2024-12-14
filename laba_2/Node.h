@@ -15,7 +15,7 @@ public:
     Node* right;            // указатель на правого потомка
 
     // конструктор узла
-    explicit Node(Key key = {}, int value = {});;
+    explicit Node(Key key = { }, int value = { });
 
     // проверка является ли некоторый узел красным
     bool IsRed();

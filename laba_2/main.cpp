@@ -19,7 +19,7 @@ int main() {
 
     auto* rbTree = new RbTree();
     int menuNumber;
-    std::string failPrompt {};
+    std::string failPrompt { };
     FileHandler fileHandler("../input_file.txt", "../output_file.txt");
 
     fmt::print(CONSOLE_PROCESS_COLOR, "Считывание информации из файла в дерево...\n");
@@ -197,8 +197,8 @@ void PrintMenu() {
 }
 
 int GetNumberInput(int min, int max, const std::string& failPrompt) {
-    int variant {};
-    std::wstring answer {};
+    int variant { };
+    std::wstring answer { };
     std::wcin >> answer;
 
     while (swscanf(answer.c_str(), L"%d", &variant) != 1 || variant < min || variant > max) {

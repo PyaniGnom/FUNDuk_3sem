@@ -1,7 +1,7 @@
 #include "RbTree.h"
 
 RbTree::RbTree() {
-    _nil = new Node({}, {});
+    _nil = new Node({ }, { });
     _nil->PaintBlack();
     _root = _nil;
 }
@@ -47,7 +47,7 @@ bool RbTree::IsExist() {
 }
 
 std::stringstream RbTree::GetPostOrderTraversal() {
-    std::stringstream result {};
+    std::stringstream result { };
     postOrder(_root, result);
     return result;
 }
@@ -326,10 +326,12 @@ void RbTree::print(Node* node, const std::string& rightPref, const std::string& 
 
     fmt::print(fmt::fg(fmt::color::aquamarine), "{}", cPref);
     if (node->IsRed()) {
-        fmt::print(CONSOLE_RED_COLOR, "R: {0} {1} {2} - {3}\n", node->key.Surname, node->key.Name, node->key.MiddleName, node->key.StateNumber);
+        fmt::print(CONSOLE_RED_COLOR, "R: {0} {1} {2} - {3}\n", node->key.Surname, node->key.Name, node->key.MiddleName,
+                   node->key.StateNumber);
     }
     else {
-        fmt::print(CONSOLE_BLACK_COLOR, "B: {0} {1} {2} - {3}\n", node->key.Surname, node->key.Name, node->key.MiddleName, node->key.StateNumber);
+        fmt::print(CONSOLE_BLACK_COLOR, "B: {0} {1} {2} - {3}\n", node->key.Surname, node->key.Name,
+                   node->key.MiddleName, node->key.StateNumber);
     }
 
     if (node->left != _nil) {
