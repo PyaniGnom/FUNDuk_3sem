@@ -10,71 +10,63 @@
 class RbTree {
 public:
     RbTree() {
-        _nil = new Node();
-        _nil->PaintBlack();
-        _root = _nil;
+        nil = new Node();
+        nil->PaintBlack();
+        root = nil;
     }
 
     ~RbTree() {
-        _root = clear(_root);
-        delete _nil;
+        root = clear(root);
+        delete nil;
     }
 
     void Insert(int key, std::string value) {
         Node* newNode = new Node(key, std::move(value));
-        newNode->left = _nil;
-        newNode->right = _nil;
+        newNode->left = nil;
+        newNode->right = nil;
         insertNode(newNode);
     }
 
     void Erase(const int& key) {
-        Node* nodeToDelete = findNode(_root, key);
-        if (nodeToDelete != _nil) {
+        Node* nodeToDelete = findNode(root, key);
+        if (nodeToDelete != nil) {
             eraseNodeWithReplacementPredecessor(nodeToDelete);
         }
     }
 
     std::string Find(const int& key) {
-        Node* node = findNode(_root, key);
-        if (node == _nil) return {};
+        Node* node = findNode(root, key);
+        if (node == nil) return {};
         return node->value;
     }
 
-    /*td::optional<std::string> Find(const int& key) {
-        Node* node = findNode(_root, key);
-        if (node == _nil || node->key != key) {
-            return std::nullopt;
-        }
-        return node->value;
-    }*/
-
     void Clear() {
-        _root = clear(_root);
-        _nil->parent = nullptr;
+        root = clear(root);
+        nil->parent = nullptr;
     }
 
     void Print() {
-        print(_root);
+        print(root);
     }
 
     /// Прямой обход дерева
     std::string GetPreOrderTraversalString() {
         std::stringstream result {};
-        preOrder(_root, result);
+        preOrder(root, result);
         return result.str();
     }
 
     /// Обратный обход дерева
     std::string GetPostOrderTraversalString() {
         std::stringstream result {};
-        postOrder(_root, result);
+        postOrder(root, result);
         return result.str();
     }
 
     /// Симметричный обход дерева
     std::string GetInOrderTraversalString() {
         std::stringstream result {};
-        inOrder(_root, result);
+        inOrder(root, result);
         return result.str();
     }
 
@@ -85,16 +77,16 @@ private:
     constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
     constexpr static fmt::text_style CONSOLE_BLACK_COLOR = fmt::fg(fmt::color::dark_gray);
 
-    Node* _root;
-    Node* _nil;
+    Node* root;
+    Node* nil;
 
     /// Правый поворот вокруг некоторого узла
     void rotateRight(Node* node) {
         Node* leftNode = node->left;
 
         leftNode->parent = node->parent;
-        if (node->parent == _nil) {
-            _root = leftNode;
+        if (node->parent == nil) {
+            root = leftNode;
         }
         else if (node->parent->right == node) {
             node->parent->right = leftNode;
@@ -104,7 +96,7 @@ private:
         }
 
         node->left = leftNode->right;
-        if (leftNode->right != _nil) {
+        if (leftNode->right != nil) {
             leftNode->right->parent = node;
         }
 
@@ -117,8 +109,8 @@ private:
         Node* rightNode = node->right;
 
         rightNode->parent = node->parent;
-        if (node->parent == _nil) {
-            _root = rightNode;
+        if (node->parent == nil) {
+            root = rightNode;
         }
         else if (node->parent->left == node) {
             node->parent->left = rightNode;
@@ -128,7 +120,7 @@ private:
         }
 
         node->right = rightNode->left;
-        if (rightNode->left != _nil) {
+        if (rightNode->left != nil) {
             rightNode->left->parent = node;
         }
 
@@ -137,16 +129,16 @@ private:
     }
 
     Node* findNode(Node* node, const int& key) {
-        while (node != _nil && node->key != key) {
+        while (node != nil && node->key != key) {
             node = (key < node->key) ? node->left : node->right;
         }
         return node;
     }
 
     Node* findParent(Node* node, const int& key) {
-        Node* parent = _nil;
+        Node* parent = nil;
 
-        while (node != _nil && node->key != key) {
+        while (node != nil && node->key != key) {
             parent = node;
             node = (key < node->key) ? node->left : node->right;
         }
@@ -154,15 +146,15 @@ private:
     }
 
     void insertNode(Node* newNode) {
-        Node* newNodeParent = findParent(_root, newNode->key);
+        Node* newNodeParent = findParent(root, newNode->key);
 
-        if (newNodeParent == _nil && _root == _nil) {
-            _root = newNode;
+        if (newNodeParent == nil && root == nil) {
+            root = newNode;
         }
-        else if (newNode->key < newNodeParent->key && newNodeParent->left == _nil) {
+        else if (newNode->key < newNodeParent->key && newNodeParent->left == nil) {
             newNodeParent->left = newNode;
         }
-        else if (newNode->key > newNodeParent->key && newNodeParent->right == _nil) {
+        else if (newNode->key > newNodeParent->key && newNodeParent->right == nil) {
             newNodeParent->right = newNode;
         }
         else {
@@ -206,30 +198,28 @@ private:
             }
             node = grandpa;
         }
-        _root->PaintBlack();
+        root->PaintBlack();
     }
 
     /// Нахождение узла с минимальным ключом в поддереве
     Node* findMin(Node* node) {
-        while (node->left != _nil) {
+        while (node->left != nil) {
             node = node->left;
         }
         return node;
-        //return (node->left != _nil) ? findMin(node->left) : node;
     }
 
     /// Нахождение узла с максимальным ключом в поддереве
     Node* findMax(Node* node) {
-        while (node->right != _nil) {
+        while (node->right != nil) {
             node = node->right;
         }
         return node;
-        //return (node->right != _nil) ? findMax(node->right) : node;
     }
 
     void replaceSubtree(Node* oldSubtree, Node* newSubtree) {
-        if (oldSubtree->parent == _nil) {
-            _root = newSubtree;
+        if (oldSubtree->parent == nil) {
+            root = newSubtree;
         }
         else if (oldSubtree == oldSubtree->parent->left) {
             oldSubtree->parent->left = newSubtree;
@@ -244,11 +234,11 @@ private:
         Node* child;
         bool removedNodeColor = nodeToDelete->color;
 
-        if (nodeToDelete->left == _nil) {
+        if (nodeToDelete->left == nil) {
             child = nodeToDelete->right;
             replaceSubtree(nodeToDelete, nodeToDelete->right);
         }
-        else if (nodeToDelete->right == _nil) {
+        else if (nodeToDelete->right == nil) {
             child = nodeToDelete->left;
             replaceSubtree(nodeToDelete, nodeToDelete->left);
         }
@@ -283,11 +273,11 @@ private:
         Node* child;
         bool removedNodeColor = nodeToDelete->color;
 
-        if (nodeToDelete->left == _nil) {
+        if (nodeToDelete->left == nil) {
             child = nodeToDelete->right;
             replaceSubtree(nodeToDelete, nodeToDelete->right);
         }
-        else if (nodeToDelete->right == _nil) {
+        else if (nodeToDelete->right == nil) {
             child = nodeToDelete->left;
             replaceSubtree(nodeToDelete, nodeToDelete->left);
         }
@@ -319,7 +309,7 @@ private:
     }
 
     void rebalanceErase(Node* node) {
-        while (node != _root && node->IsBlack()) {
+        while (node != root && node->IsBlack()) {
             if (node == node->parent->left) {
                 node = handleLeftRebalanceErase(node);
             }
@@ -353,7 +343,7 @@ private:
             node->parent->PaintBlack();
             brother->right->PaintBlack();
             rotateLeft(node->parent);
-            node = _root;
+            node = root;
         }
         return node;
     }
@@ -381,13 +371,13 @@ private:
             node->parent->PaintBlack();
             brother->left->PaintBlack();
             rotateRight(node->parent);
-            node = _root;
+            node = root;
         }
         return node;
     }
 
     Node* clear(Node* node) {
-        if (node == _nil) return _nil;
+        if (node == nil) return nil;
 
         if (node->left) {
             node->left = clear(node->left);
@@ -396,13 +386,13 @@ private:
             node->right = clear(node->right);
         }
         delete node;
-        return _nil;
+        return nil;
     }
 
     void print(Node* node, const std::string& rpref = "", const std::string& cpref = "", const std::string& lpref = "") {
-        if (node == _nil) return;
+        if (node == nil) return;
 
-        if (node->right != _nil) {
+        if (node->right != nil) {
             print(node->right, rpref + "  ", rpref + CH_DOWN_HOR, rpref + CH_VER);
         }
 
@@ -414,13 +404,13 @@ private:
             fmt::print(CONSOLE_BLACK_COLOR, "B:{}\n", node->key);
         }
 
-        if (node->left != _nil) {
+        if (node->left != nil) {
             print(node->left, lpref + CH_VER, lpref + CH_UP_HOR, lpref + "  ");
         }
     }
 
     void preOrder(const Node* node, std::stringstream& result) {
-        if (node == _nil) return;
+        if (node == nil) return;
 
         result << node->key << " ";
         preOrder(node->left, result);
@@ -428,7 +418,7 @@ private:
     }
 
     void postOrder(const Node* node, std::stringstream& result) {
-        if (node == _nil) return;
+        if (node == nil) return;
 
         postOrder(node->left, result);
         postOrder(node->right, result);
@@ -436,7 +426,7 @@ private:
     }
 
     void inOrder(const Node* node, std::stringstream& result) {
-        if (node == _nil) return;
+        if (node == nil) return;
 
         inOrder(node->left, result);
         result << node->key << " ";

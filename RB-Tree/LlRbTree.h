@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 #ifndef RB_TREE_LLRBTREE_H
 #define RB_TREE_LLRBTREE_H
 
@@ -11,62 +9,62 @@
 class LlRbTree {
 public:
     LlRbTree() {
-        _nil = new Node();
-        _nil->PaintBlack();
-        _root = _nil;
+        nil = new Node();
+        nil->PaintBlack();
+        root = nil;
     }
 
     ~LlRbTree() {
-        _root = clear(_root);
-        delete _nil;
+        root = clear(root);
+        delete nil;
     }
 
     void Insert(int key, std::string value) {
         Node* newNode = new Node(key, std::move(value));
-        newNode->left = _nil;
-        newNode->right = _nil;
-        _root = insertNode(_root, newNode);
-        _root->PaintBlack();
+        newNode->left = nil;
+        newNode->right = nil;
+        root = insertNode(root, newNode);
+        root->PaintBlack();
     }
 
     void Erase(const int& key) {
-        _root = eraseNode(_root, key);
-        _root->PaintBlack();
+        root = eraseNode(root, key);
+        root->PaintBlack();
     }
 
     std::string Find(const int& key) {
-        Node* node = searchNode(_root, key);
-        if (node == _nil) return {};
+        Node* node = searchNode(root, key);
+        if (node == nil) return {};
         return node->value;
     }
 
     void Clear() {
-        _root = clear(_root);
+        root = clear(root);
     }
 
     void Print() {
         fmt::print("\n");
-        print(_root);
+        print(root);
     }
 
     /// Прямой обход дерева
     std::string GetPreOrderTraversalString() {
         std::stringstream result {};
-        preOrder(_root, result);
+        preOrder(root, result);
         return result.str();
     }
 
     /// Обратный обход дерева
     std::string GetPostOrderTraversalString() {
         std::stringstream result {};
-        postOrder(_root, result);
+        postOrder(root, result);
         return result.str();
     }
 
     /// Симметричный обход дерева
     std::string GetInOrderTraversalString() {
         std::stringstream result {};
-        inOrder(_root, result);
+        inOrder(root, result);
         return result.str();
     }
 
@@ -77,8 +75,8 @@ private:
     constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
     constexpr static fmt::text_style CONSOLE_BLACK_COLOR = fmt::fg(fmt::color::dark_gray);
 
-    Node* _root;
-    Node* _nil;
+    Node* root;
+    Node* nil;
 
     // правый поворот вокруг некоторого узла
     static Node* rotateRight(Node* node) {
@@ -109,8 +107,8 @@ private:
     // реверс цветов некоторого узла и его потомков
     void flipColors(Node* node) {
         node->color = !node->color;
-        if (node->left != _nil) node->left->color = !node->left->color;
-        if (node->right != _nil) node->right->color = !node->right->color;
+        if (node->left != nil) node->left->color = !node->left->color;
+        if (node->right != nil) node->right->color = !node->right->color;
     }
 
     // фикс дерева с корнем node
@@ -129,7 +127,7 @@ private:
 
     // вставка нового узла newNode в дерево с корнем node
     Node* insertNode(Node* node, Node* newNode) {
-        if (node == _nil) return newNode;
+        if (node == nil) return newNode;
 
         if (newNode->key < node->key) {
             node->left = insertNode(node->left, newNode);
@@ -164,11 +162,11 @@ private:
     }
 
     Node* findMin(Node* node) {
-        return node->left != _nil ? findMin(node->left) : node;
+        return node->left != nil ? findMin(node->left) : node;
     }
 
     Node* removeMin(Node* node) {
-        if (node->left == _nil) return _nil;
+        if (node->left == nil) return nil;
 
         if (node->left->IsBlack() && node->left->left->IsBlack()) {
             node = moveRedLeft(node);
@@ -179,10 +177,10 @@ private:
     }
 
     Node* eraseNode(Node* node, const int& key) {
-        if (node == _nil) return _nil;
+        if (node == nil) return nil;
 
         if (key < node->key) {
-            if (node->left != _nil && node->left->IsBlack() && node->left->left->IsBlack()) {
+            if (node->left != nil && node->left->IsBlack() && node->left->left->IsBlack()) {
                 node = moveRedLeft(node);
             }
             node->left = eraseNode(node->left, key);
@@ -191,11 +189,11 @@ private:
             if (node->left->IsRed()) {
                 node = rotateRight(node);
             }
-            if (key == node->key && node->right == _nil) {
+            if (key == node->key && node->right == nil) {
                 delete node;
-                return _nil;
+                return nil;
             }
-            if (node->right != _nil && node->right->IsBlack() && node->right->left->IsBlack()) {
+            if (node->right != nil && node->right->IsBlack() && node->right->left->IsBlack()) {
                 node = moveRedRight(node);
             }
             if (key == node->key) {
@@ -217,7 +215,7 @@ private:
     }
 
     Node* searchNode(Node* node, const int& key) {
-        if (node == _nil || node->key == key) return node;
+        if (node == nil || node->key == key) return node;
 
         if (key < node->key) {
             return searchNode(node->left, key);
@@ -228,7 +226,7 @@ private:
     }
 
     Node* clear(Node* node) {
-        if (node == _nil) return _nil;
+        if (node == nil) return nil;
 
         if (node->left) {
             node->left = clear(node->left);
@@ -237,13 +235,13 @@ private:
             node->right = clear(node->right);
         }
         delete node;
-        return _nil;
+        return nil;
     }
 
     void print(Node* node, const std::string& rpref = "", const std::string& cpref = "", const std::string& lpref = "") {
-        if (node == _nil) return;
+        if (node == nil) return;
 
-        if (node->right != _nil) {
+        if (node->right != nil) {
             print(node->right, rpref + "  ", rpref + CH_DOWN_HOR, rpref + CH_VER);
         }
 
@@ -255,13 +253,13 @@ private:
             fmt::print(CONSOLE_BLACK_COLOR, "B:{}\n", node->key);
         }
 
-        if (node->left != _nil) {
+        if (node->left != nil) {
             print(node->left, lpref + CH_VER, lpref + CH_UP_HOR, lpref + "  ");
         }
     }
 
     void preOrder(const Node* node, std::stringstream& result) {
-        if (node == _nil) return;
+        if (node == nil) return;
 
         result << node->key << " ";
         preOrder(node->left, result);
@@ -269,7 +267,7 @@ private:
     }
 
     void postOrder(const Node* node, std::stringstream& result) {
-        if (node == _nil) return;
+        if (node == nil) return;
 
         postOrder(node->left, result);
         postOrder(node->right, result);
@@ -277,7 +275,7 @@ private:
     }
 
     void inOrder(const Node* node, std::stringstream& result) {
-        if (node == _nil) return;
+        if (node == nil) return;
 
         inOrder(node->left, result);
         result << node->key << " ";
@@ -287,4 +285,3 @@ private:
 
 
 #endif //RB_TREE_LLRBTREE_H
-#pragma clang diagnostic pop
