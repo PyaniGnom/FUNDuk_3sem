@@ -1,21 +1,42 @@
-#include <iostream>
-#include <string>
+#include <chrono>
+#include <fmt/color.h>
 #include <fstream>
-#include <vector>
+#include <iostream>
+#include <map>
 #include <random>
 #include <sstream>
-#include <fmt/color.h>
+#include <string>
+#include <vector>
 
 int GenerateRandomInt(int min, int max);
-int GetRecordsNumber(int maxNumber);
-std::vector<std::string> GetVectorFromFile(const std::string& fileName);
-std::vector<int> GetRegionVector(const std::string& fileName);
+
+int ReadValidNumber(std::string errorMessage, int min, int max);
+
+char ReadSeparatorFromUser(std::string message, std::string errorMessage);
+
+std::vector<std::string> GetVectorFromFile(const std::string& filePath);
+
+std::vector<int> GetRegionVectorFromFile(const std::string& filePath);
 
 std::string GetRandomSurname(bool isMale);
+
 std::string GetRandomName(bool isMale);
+
 std::string GetRandomMiddleName(bool isMale);
+
 std::string GetRandomStateNumber();
-void GenerateFile(const std::string& fileName, int recordsNumber);
+
+std::string GetRandomTime();
+
+enum class GenerationPattern {
+    FullNamePlusStateNumber = 1,
+    FullNamePlusTime = 2,
+    StateNumberPlusFullName = 3,
+    TimePlusFullName = 4
+};
+
+void GenerateFile(const std::string& filePath, int recordsNumber, GenerationPattern pattern,
+                  char columnSep, char fullNameSep, bool isNeedEndOfLineSep);
 
 static std::vector<std::string> LetterVec;
 static std::vector<int> RegionVec;
@@ -24,6 +45,12 @@ static std::vector<std::string> MaleNamesVec;
 static std::vector<std::string> FemaleNamesVec;
 static std::vector<std::string> MiddleNamesVec;
 
+static std::map<int, char> SEPARATOR_MAP = {
+        { 1, ';' },
+        { 2, '|' },
+        { 3, ' ' },
+};
+
 constexpr static fmt::text_style CONSOLE_RED_COLOR = fmt::fg(fmt::color::red);
 constexpr static fmt::text_style CONSOLE_GREEN_COLOR = fmt::fg(fmt::color::forest_green);
 constexpr static fmt::text_style CONSOLE_AQUA_COLOR = fmt::fg(fmt::color::aqua);
@@ -31,64 +58,156 @@ constexpr static fmt::text_style CONSOLE_AQUA_COLOR = fmt::fg(fmt::color::aqua);
 int main() {
     setlocale(LC_ALL, "");
 
-    fmt::print(CONSOLE_AQUA_COLOR, "Подождите, идёт считывание информации...\n");
+    fmt::print(CONSOLE_AQUA_COLOR, "\nПодождите, идёт считывание информации...\n");
 
-    auto letterVec = GetVectorFromFile("../license_plate_letters.txt");
+    std::string plateLettersDictionaryPath = "../dictionaries/vehicle_registration_plate_letters.txt";
+    std::string regionCodesDictionaryPath = "../dictionaries/region_codes.txt";
+    std::string surnamesDictionaryPath = "../dictionaries/surnames/surnames.txt";
+    std::string maleNamesDictionaryPath = "../dictionaries/names/male.txt";
+    std::string femaleNamesDictionaryPath = "../dictionaries/names/female.txt";
+    std::string middleNamesDictionaryPath = "../dictionaries/middle_names/middle_names.txt";
+    std::string outputFilePath = "../output_file.txt";
+
+    auto letterVec = GetVectorFromFile(plateLettersDictionaryPath);
     LetterVec = std::move(letterVec);
-    auto regionVec = GetRegionVector("../region_codes.txt");
+    auto regionVec = GetRegionVectorFromFile(regionCodesDictionaryPath);
     RegionVec = std::move(regionVec);
-    auto surnamesVec = GetVectorFromFile("../surnames.txt");
+    auto surnamesVec = GetVectorFromFile(surnamesDictionaryPath);
     SurnamesVec = std::move(surnamesVec);
-    auto maleNamesVec = GetVectorFromFile("../male_names.txt");
+    auto maleNamesVec = GetVectorFromFile(maleNamesDictionaryPath);
     MaleNamesVec = std::move(maleNamesVec);
-    auto femaleNamesVec = GetVectorFromFile("../female_names.txt");
+    auto femaleNamesVec = GetVectorFromFile(femaleNamesDictionaryPath);
     FemaleNamesVec = std::move(femaleNamesVec);
-    auto middleNamesVec = GetVectorFromFile("../middle_names.txt");
+    auto middleNamesVec = GetVectorFromFile(middleNamesDictionaryPath);
     MiddleNamesVec = std::move(middleNamesVec);
 
     fmt::print(CONSOLE_GREEN_COLOR, "Готово!\n");
 
+    fmt::print(
+            "\nВыберите вариант генерации:\n"
+            "1. ФИО + Автомобильный номер (Госномер)\n"
+            "2. ФИО + Время (Часы:Минуты)\n"
+            "3. Автомобильный номер (Госномер) + ФИО\n"
+            "4. Время (Часы:Минуты) + ФИО\n"
+    );
+    fmt::print(CONSOLE_AQUA_COLOR, "> ");
+    auto pattern = (GenerationPattern) ReadValidNumber("Нет такого варианта!\n", 1, 4);
+
+    char columnSeparator = ReadSeparatorFromUser(
+            "\nВыберите разделитель для колонок:\n",
+            "Нет такого варианта!\n"
+    );
+    char fullNameSeparator = ReadSeparatorFromUser(
+            "\nВыберите разделитель для ФИО:\n",
+            "Нет такого варианта!\n"
+    );
+
+    fmt::print(
+            "\nВставлять в конце строк разделитель для колонок?\n"
+            "1. Да\n"
+            "2. Нет\n"
+    );
+    fmt::print(CONSOLE_AQUA_COLOR, "> ");
+    bool isNeedEndOfLineSeparator = ReadValidNumber("Нет такого варианта!\n", 1, 2) == 1 ? true : false;
+
     fmt::print("\nВведите желаемое количество записей в файле:\n");
     fmt::print(CONSOLE_AQUA_COLOR, "> ");
-    int recordsNumber = GetRecordsNumber(10000);
+    int recordsNumber = ReadValidNumber("Недопустимое количество!\n", 1, 10000);
 
     fmt::print(CONSOLE_AQUA_COLOR, "\nЗапись...\n");
 
-    GenerateFile("../output_file.txt", recordsNumber);
+    auto start = std::chrono::steady_clock::now();
+    GenerateFile(outputFilePath, recordsNumber, pattern,
+                 columnSeparator, fullNameSeparator, isNeedEndOfLineSeparator);
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsedTime = end - start;
 
     fmt::print(CONSOLE_GREEN_COLOR, "Готово!\n");
+    fmt::print("Время генерации файла: {:0.7f} сек\n", elapsedTime.count());
 
     return 0;
 }
 
-void GenerateFile(const std::string& fileName, int recordsNumber) {
+void GenerateFile(const std::string& filePath, int recordsNumber, GenerationPattern pattern,
+                  char columnSep, char fullNameSep, bool isNeedEndOfLineSep) {
     std::stringstream record;
     bool isMale;
 
-    std::ofstream file(fileName);
+    std::ofstream file(filePath);
     if (!file.is_open()) {
         throw std::runtime_error("\nНе удалось открыть выходной файл!\n");
     }
 
-    for (int i = 0; i < recordsNumber; ++i) {
-        isMale = GenerateRandomInt(0, 1);
-        record << GetRandomSurname(isMale) << ";";
-        record << GetRandomName(isMale) << ";";
-        record << GetRandomMiddleName(isMale) << ";";
-        record << GetRandomStateNumber() << ";\n";
-        file << record.str();
-        record.str("");
-        record.clear();
+    std::string endOfLineSep;
+    if (isNeedEndOfLineSep) {
+        endOfLineSep = columnSep;
+    }
+    else {
+        endOfLineSep = "";
+    }
+    switch (pattern) {
+        case GenerationPattern::FullNamePlusStateNumber: {
+            for (int i = 0; i < recordsNumber; ++i) {
+                isMale = GenerateRandomInt(0, 1);
+                record << GetRandomSurname(isMale) << fullNameSep;
+                record << GetRandomName(isMale) << fullNameSep;
+                record << GetRandomMiddleName(isMale) << columnSep;
+                record << GetRandomStateNumber() << endOfLineSep << "\n";
+                file << record.str();
+                record.str("");
+                record.clear();
+            }
+            break;
+        }
+        case GenerationPattern::FullNamePlusTime: {
+            for (int i = 0; i < recordsNumber; ++i) {
+                isMale = GenerateRandomInt(0, 1);
+                record << GetRandomSurname(isMale) << fullNameSep;
+                record << GetRandomName(isMale) << fullNameSep;
+                record << GetRandomMiddleName(isMale) << columnSep;
+                record << GetRandomTime() << endOfLineSep << "\n";
+                file << record.str();
+                record.str("");
+                record.clear();
+            }
+            break;
+        }
+        case GenerationPattern::StateNumberPlusFullName: {
+            for (int i = 0; i < recordsNumber; ++i) {
+                isMale = GenerateRandomInt(0, 1);
+                record << GetRandomStateNumber() << columnSep;
+                record << GetRandomSurname(isMale) << fullNameSep;
+                record << GetRandomName(isMale) << fullNameSep;
+                record << GetRandomMiddleName(isMale) << endOfLineSep << "\n";
+                file << record.str();
+                record.str("");
+                record.clear();
+            }
+            break;
+        }
+        case GenerationPattern::TimePlusFullName: {
+            for (int i = 0; i < recordsNumber; ++i) {
+                isMale = GenerateRandomInt(0, 1);
+                record << GetRandomTime() << columnSep;
+                record << GetRandomSurname(isMale) << fullNameSep;
+                record << GetRandomName(isMale) << fullNameSep;
+                record << GetRandomMiddleName(isMale) << endOfLineSep << "\n";
+                file << record.str();
+                record.str("");
+                record.clear();
+            }
+            break;
+        }
     }
 
     file.close();
 }
 
-std::vector<std::string> GetVectorFromFile(const std::string& fileName) {
+std::vector<std::string> GetVectorFromFile(const std::string& filePath) {
     std::vector<std::string> vec;
     std::string str;
 
-    std::ifstream file(fileName);
+    std::ifstream file(filePath);
     if (!file.is_open()) {
         throw std::runtime_error("\nНе удалось открыть входной файл!\n");
     }
@@ -108,11 +227,11 @@ std::vector<std::string> GetVectorFromFile(const std::string& fileName) {
     return vec;
 }
 
-std::vector<int> GetRegionVector(const std::string& fileName) {
+std::vector<int> GetRegionVectorFromFile(const std::string& filePath) {
     std::vector<int> vec;
     std::string code;
 
-    std::ifstream file(fileName);
+    std::ifstream file(filePath);
     if (!file.is_open()) {
         throw std::runtime_error("\nНе удалось открыть входной файл!\n");
     }
@@ -196,18 +315,57 @@ std::string GetRandomStateNumber() {
     return stateNumber;
 }
 
-int GetRecordsNumber(int maxNumber) {
-    int number {};
-    std::wstring answer {};
+std::string GetRandomTime() {
+    std::string time;
+
+    std::string tempStr = std::to_string(GenerateRandomInt(0, 23));
+    if (tempStr.length() == 1) {
+        tempStr.insert(0, "0");
+    }
+    time.append(tempStr);
+    time.append(":");
+
+    tempStr = std::to_string(GenerateRandomInt(0, 59));
+    if (tempStr.length() == 1) {
+        tempStr.insert(0, "0");
+    }
+    time.append(tempStr);
+
+    return time;
+}
+
+int ReadValidNumber(std::string errorMessage, int min, int max) {
+    int number { };
+    std::wstring answer { };
     std::wcin >> answer;
 
-    while (swscanf(answer.c_str(), L"%d", &number) != 1 || number < 1 || number > maxNumber) {
-        fmt::print(CONSOLE_RED_COLOR, "Недопустимое количество!\n");
+    while (swscanf(answer.c_str(), L"%d", &number) != 1 || number < min || number > max) {
+        fmt::print(CONSOLE_RED_COLOR, "{}", errorMessage);
         fmt::print(CONSOLE_AQUA_COLOR, "> ");
         std::wcin >> answer;
     }
 
     return number;
+}
+
+char ReadSeparatorFromUser(std::string message, std::string errorMessage) {
+    fmt::print("{}", message);
+    for (auto it: SEPARATOR_MAP) {
+        fmt::print("{0}. \"{1}\"\n", it.first, it.second);
+    }
+    fmt::print(CONSOLE_AQUA_COLOR, "> ");
+
+    int number { };
+    std::wstring answer { };
+    std::wcin >> answer;
+
+    while (swscanf(answer.c_str(), L"%d", &number) != 1 || number < 1 || number > SEPARATOR_MAP.size()) {
+        fmt::print(CONSOLE_RED_COLOR, "{}", errorMessage);
+        fmt::print(CONSOLE_AQUA_COLOR, "> ");
+        std::wcin >> answer;
+    }
+
+    return SEPARATOR_MAP[number];
 }
 
 int GenerateRandomInt(int min, int max) {
